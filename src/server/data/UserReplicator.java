@@ -4,14 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import server.User;
 
 public class UserReplicator
 {
-    private Connection connection;
-    
     /* Prepared Statements */
     private PreparedStatement createUserTable;
     private PreparedStatement insertUser;
@@ -19,9 +18,7 @@ public class UserReplicator
     private PreparedStatement findByDivision;
 
     public UserReplicator(Connection connection) throws SQLException
-    {
-        this.connection = connection;
-        
+    { 
         String tableQuery = "CREATE TABLE IF NOT EXISTS user (" + 
                             "id INTEGER PRIMARY KEY autoincrement, " + 
                             "type INTEGER, " + 
@@ -34,7 +31,7 @@ public class UserReplicator
         
         String insertQuery = "INSERT INTO user (type, name, division, password, salt)" +
                              "VALUES (?, ?, ?, ?, ?);";
-        this.insertUser = connection.prepareStatement(insertQuery);
+        this.insertUser = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
         
         String findByDivisionQuery = "SELECT *  FROM user u WHERE u.id=? ORDER BY u.id ASC";
         this.findByDivision = connection.prepareStatement(findByDivisionQuery);
@@ -51,6 +48,13 @@ public class UserReplicator
         insertUser.setString(4, user.getPassword());
         insertUser.setString(5, user.getSalt());
         insertUser.execute();
+        
+        ResultSet generatedKeys = insertUser.getGeneratedKeys();
+        if (generatedKeys.next()) {
+            user.setId(generatedKeys.getInt(1));
+        } else {
+            throw new SQLException("Creating user failed, no ID obtained.");
+        }
     }
     
     public ArrayList<User> findAll() throws SQLException

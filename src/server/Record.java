@@ -35,18 +35,39 @@ public class Record
     {
         return patientName;
     }
+    
+    public int getPatientId()
+    {
+        return patientId;
+    }
 
     public String getNurseName()
     {
         return nurseName;
+    }
+    
+    public int getNurseId()
+    {
+        return nurseId;
     }
 
     public String getDoctorName()
     {
         return doctorName;
     }
-    public String getDivision(){
+    
+    public int getDoctorId()
+    {
+        return doctorId;
+    }
+    
+    public String getDivision()
+    {
         return division;
     }
     
+    public String getData()
+    {
+        return data;
+    }
 }

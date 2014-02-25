@@ -49,6 +49,10 @@ public class User
         return this.id;
     }
     
+    public void setId(int id) {
+        this.id = id;
+    }
+    
     public int getType() {
         return this.type;
     }

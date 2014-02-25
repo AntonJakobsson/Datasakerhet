@@ -9,6 +9,7 @@ public class Database
     private String path;
     private Connection connection;
     private UserReplicator userReplicator;
+    private RecordReplicator recordReplicator;
     
     public Database(String databaseFile)
     {
@@ -28,6 +29,7 @@ public class Database
             this.connection = DriverManager.getConnection("jdbc:sqlite:" + path);
             this.connection.setAutoCommit(true);
             this.userReplicator = new UserReplicator(this.connection);
+            this.recordReplicator = new  RecordReplicator(this.connection);
         }
         catch (SQLException e) {
             System.out.println("Unable to connect to database:");
@@ -46,5 +48,9 @@ public class Database
     
     public UserReplicator users() {
         return this.userReplicator;
+    }
+    
+    public RecordReplicator records() {
+        return this.recordReplicator;
     }
 }
