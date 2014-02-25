@@ -1,0 +1,47 @@
+EIT060 - projekt 2 Server/Client notes
+
+SERVER -> CLIENT
+
+lista av record(s)
+packet med record eller meddelande/användare
+
+CLIENT -> SERVER
+
+Query			(patient, division, egna, all)
+Uppdatera
+Lägg till
+Ta bort
+
+Hämta info från certifikat -> behöver ej fråga servern vem som är inloggad
+
+skicka packet till server vid uppdatering osv.
+
+
+COMMANDS
+
+Query
+Parameter: User/Division/All
+Returns: lista med record-object
+
+Add
+Parameter: Record-objekt
+Returns: Record-objekt
+
+Update
+Parameter: Record-objekt
+Returns: Record-objekt
+
+Delete
+Parameter: Record ID
+Returns: 
+
+Authenticte
+Parameter: ID, password
+Returns: User-objekt
+
+
+
+PACKET
+
+int		type
+String	data <- Serialiserad record eller meddelande/användare etc.
