@@ -43,11 +43,12 @@ public class Security
      * @param iterations Antal iterationer
      * @return
      */
-    public static String hash(String password, int iterations) 
+    public static String hash(String password, String salt) 
     {
+        int iterations = 100000;
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = password.getBytes("UTF-8");
+            byte[] hash = (password + salt).getBytes("UTF-8");
             
             for(int i = 0; i < iterations; i++)
                 hash = digest.digest(hash);

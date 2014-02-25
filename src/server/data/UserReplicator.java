@@ -4,9 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+
+import server.User;
 
 public class UserReplicator
 {
+    private Connection connection;
+    
     /* Prepared Statements */
     private PreparedStatement createUserTable;
     private PreparedStatement insertUser;
@@ -15,49 +20,55 @@ public class UserReplicator
 
     public UserReplicator(Connection connection) throws SQLException
     {
+        this.connection = connection;
+        
         String tableQuery = "CREATE TABLE IF NOT EXISTS user (" + 
-                            "id INT(32) NOT NULL auto_increment, " + 
-                            "type INT(32), " + 
+                            "id INTEGER PRIMARY KEY autoincrement, " + 
+                            "type INTEGER, " + 
                             "name VARCHAR(255), " + 
                             "division VARCHAR(16), " + 
                             "password VARCHAR(64), " +
-                            "salt VARCHAR(64), " +
-                            "PRIMARY KEY (id));";
+                            "salt VARCHAR(64));";
         this.createUserTable = connection.prepareStatement(tableQuery);
+        this.createUserTable.execute();
         
-        String insertQuery = "INSERT INTO `user` (type, name, division, password, salt)" +
+        String insertQuery = "INSERT INTO user (type, name, division, password, salt)" +
                              "VALUES (?, ?, ?, ?, ?);";
         this.insertUser = connection.prepareStatement(insertQuery);
         
-        String findByDivisionQuery = "SELECT *  FROM `user` u WHERE u.id=? ORDER BY u.id ASC";
+        String findByDivisionQuery = "SELECT *  FROM user u WHERE u.id=? ORDER BY u.id ASC";
         this.findByDivision = connection.prepareStatement(findByDivisionQuery);
         
-        String findAllQuery = "SELECT * FROM `user` ORDER BY id  ASC";
+        String findAllQuery = "SELECT * FROM `user` u ORDER BY u.id  ASC";
         this.findAll = connection.prepareStatement(findAllQuery);
     }
-
-    public void createTable() throws SQLException
+    
+    public void insert(User user) throws SQLException
     {
-        createUserTable.execute();
+        insertUser.setInt(1,    user.getType());
+        insertUser.setString(2, user.getName());
+        insertUser.setString(3, user.getDivision());
+        insertUser.setString(4, user.getPassword());
+        insertUser.setString(5, user.getSalt());
+        insertUser.execute();
     }
     
-    public void insert(int type, String name, String division, 
-                       String password, String salt) throws SQLException
+    public ArrayList<User> findAll() throws SQLException
     {
-        insertUser.setInt(1, type);
-        insertUser.setString(2, name);
-        insertUser.setString(3, division);
-        insertUser.setString(4, password);
-        insertUser.setString(5, salt);
-        insertUser.executeUpdate();
-    }
-    
-    public void findAll() throws SQLException
-    {
+        ArrayList<User> users = new ArrayList<User>();
         ResultSet results = findAll.executeQuery();
         while(results.next())
         {
-            
+            User user = new  User(
+                results.getInt("id"),
+                results.getInt("type"),
+                results.getString("name"),
+                results.getString("division"),
+                results.getString("password"),
+                results.getString("salt")
+            );
+            users.add(user);
         }
+        return users;
     }
 }
