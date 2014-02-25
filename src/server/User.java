@@ -16,10 +16,27 @@ public class User
     private String          password;
     private String          salt;
 
+    /**
+     * Konstruktor för att skapa en NY användare
+     * @param type Användartyp
+     * @param name Namn
+     * @param division Division
+     * @param password Lösenord (klartext)
+     */
     public User(int type, String name, String division, String password) {
-        this(0, type, name, division, password, Security.generateSalt());
+        this(0, type, name, division, "", "");
+        this.setPassword(password);
     }
     
+    /**
+     * Konstruktor för att skapa ett användarobjekt för en användare som redan är lagrad i databasen
+     * @param id ID
+     * @param type Användartyp
+     * @param name Namn
+     * @param division Division
+     * @param password Lösenordshash
+     * @param salt Salt
+     */
     public User(int id, int type, String name, String division, String password, String salt)
     {
         this.id = id;
@@ -48,7 +65,31 @@ public class User
         return this.password;
     }
     
+    /**
+     * Sätter lösenordet och skapar ett nytt salt
+     * @param password Lösenordet i klartext
+     */
+    public void setPassword(String password)
+    {
+        this.salt = Security.generateSalt();
+        this.password = Security.hash(password, this.salt);
+    }
+    
     public String getSalt() {
         return this.salt;
+    }
+    
+    public String toString() {
+        return String.format("User %d: %s (%s, %s)", id, name, User.typeString(type), division);
+    }
+    
+    public static String typeString(int type) {
+        switch(type) {
+            case User.PATIENT:    return "Patient";
+            case User.NURSE:      return "Nurse";
+            case User.DOCTOR:     return "Doctor";
+            case User.GOVERNMENT: return "Government Agency";
+            default:              return "Invalid";
+        }
     }
 }
