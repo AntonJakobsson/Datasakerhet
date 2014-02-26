@@ -1,6 +1,8 @@
 package GUI;
 
-public class TextArea
+import javax.swing.JTextField;
+
+public class TextArea extends JTextField
 {
 
 }
