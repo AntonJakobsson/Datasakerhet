@@ -1,5 +1,8 @@
 package GUI;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -7,10 +10,16 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-public class loginWindow {
+/**
+ * Login Window
+ * 
+ */
+public class loginWindow
+{
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Awesome medical journal system");
+    public static void main(String[] args)
+    {
+        JFrame frame = new JFrame("Login");
         frame.setSize(300, 150);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -21,7 +30,8 @@ public class loginWindow {
         frame.setVisible(true);
     }
 
-    private static void placeComponents(JPanel panel) {
+    private static void placeComponents(JPanel panel)
+    {
 
         panel.setLayout(null);
 
@@ -44,6 +54,24 @@ public class loginWindow {
         JButton loginButton = new JButton("login");
         loginButton.setBounds(10, 80, 80, 25);
         panel.add(loginButton);
+        loginButton.addActionListener(new ButtonListener());
+    }
+
+    private static class ButtonListener implements ActionListener
+    {
+        private ButtonListener()
+        {
+        }
+
+        public void actionPerformed(ActionEvent e)
+        {
+            returnCredentials();
+        }
+    }
+
+    private static String returnCredentials()
+    {
+        return null;
     }
 
 }

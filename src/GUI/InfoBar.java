@@ -1,13 +1,14 @@
 package GUI;
 
-import javax.swing.JTextField;
+import javax.swing.JLabel;
 
-public class InfoBar extends JTextField
+public class InfoBar extends JLabel
 {
     private String currentUser;
 
-    public InfoBar(){
-        
+    public InfoBar(String currentUser){
+        super(currentUser);
+        this.currentUser = currentUser;
     }
     
     public void setUser(String username){
