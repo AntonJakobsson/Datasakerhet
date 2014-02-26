@@ -17,16 +17,18 @@ public class RecordReplicator
     public RecordReplicator(Connection connection) throws SQLException
     {
         String createTableQuery = "CREATE TABLE IF NOT EXISTS record ("+
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, "+
-                "patient INTEGER, nurse INTEGER, doctor INTEGER, data TEXT, division VARCHAR(32));";
+                                  "id INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                                  "patient INTEGER, nurse INTEGER, doctor INTEGER, "+
+                                  "data TEXT, division VARCHAR(32));";
         this.createTable = connection.prepareStatement(createTableQuery);
         this.createTable.execute();
         
-        String insertQuery = "INSERT INTO `record` (patient, nurse, doctor, data, division)"+
+        String insertQuery = "INSERT INTO `record` (patient, nurse, doctor, data, division) "+
                              "VALUES (?, ?, ?, ?, ?)";
         this.insertRecord = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
         
-        String byPatientQuery = "SELECT r.id, r.data, r.division, p.id, p.name, n.id, n.name, d.id, d.name " +
+        String byPatientQuery = "SELECT r.id, r.data, r.division, p.id, p.name, n.id, n.name, " +
+        		                "d.id, d.name " +
                                 "FROM (((`record` r LEFT JOIN `user` p ON p.id=r.patient) "+
                                 "LEFT JOIN `user` n ON n.id=r.nurse) "+
                                 "LEFT JOIN `user` d ON d.id=r.doctor) "+
