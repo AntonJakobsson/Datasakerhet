@@ -39,9 +39,9 @@ public class RecordReplicator
         );
         this.findById     = connection.prepareStatement(whereQuery("r.id=?"));
         this.findByUser   = connection.prepareStatement(whereQuery("(r.patient=? OR r.nurse=? OR r.doctor=?)"));
-        this.findAll      = connection.prepareStatement(whereQuery("TRUE"));
+        this.findAll      = connection.prepareStatement(whereQuery("1=1"));
         this.deleteRecord = connection.prepareStatement(
-            "UPDATE `record` r SET r.active=0 WHERE r.id=? LIMIT 1"
+            "UPDATE `record` SET active=0 WHERE id=?"
         );
     }
     

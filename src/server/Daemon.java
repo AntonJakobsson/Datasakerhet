@@ -30,6 +30,7 @@ public class Daemon
             System.out.println("Unable to start Server: " + e.getMessage());
             e.printStackTrace();
         }
+        System.out.println(String.format("Listening on port %d... (SSL)", port));
     }
     
     public void fork() throws IOException
@@ -55,6 +56,7 @@ public class Daemon
 
             ks.load(new FileInputStream("serverkey.store"),   password); // keystore password (storepass)
             ts.load(new FileInputStream("servertrust.store"), password); // truststore password (storepass)
+            System.out.println("Key & Trust stores loaded");
             
             kmf.init(ks, password); // certificate password (keypass)
             tmf.init(ts);  // possible to use keystore as truststore here
