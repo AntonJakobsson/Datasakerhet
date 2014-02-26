@@ -15,6 +15,8 @@ public class UserReplicator
     private PreparedStatement createUserTable;
     private PreparedStatement insertUser;
     private PreparedStatement findAll;
+    private PreparedStatement findById;
+    private PreparedStatement findByType;
     private PreparedStatement findByDivision;
 
     public UserReplicator(Connection connection) throws SQLException
@@ -33,11 +35,17 @@ public class UserReplicator
                              "VALUES (?, ?, ?, ?, ?);";
         this.insertUser = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
         
-        String findByDivisionQuery = "SELECT *  FROM user u WHERE u.id=? ORDER BY u.id ASC";
+        String findByDivisionQuery = "SELECT * FROM user u WHERE u.id=? ORDER BY u.id ASC";
         this.findByDivision = connection.prepareStatement(findByDivisionQuery);
         
         String findAllQuery = "SELECT * FROM `user` u ORDER BY u.id  ASC";
         this.findAll = connection.prepareStatement(findAllQuery);
+        
+        String findByIdQuery = "SELECT * FROM `user` u WHERE u.id=? LIMIT 1";
+        this.findById = connection.prepareStatement(findByIdQuery);
+    
+        String findByTypeQuery = "SELECT * FROM `user` u WHERE u.type=? ORDER BY u.id ASC";
+        this.findByType = connection.prepareStatement(findByTypeQuery);
     }
     
     public void insert(User user) throws SQLException
@@ -57,10 +65,9 @@ public class UserReplicator
         }
     }
     
-    public ArrayList<User> findAll() throws SQLException
+    private ArrayList<User> getUsers(ResultSet results) throws SQLException
     {
         ArrayList<User> users = new ArrayList<User>();
-        ResultSet results = findAll.executeQuery();
         while(results.next())
         {
             User user = new  User(
@@ -74,5 +81,35 @@ public class UserReplicator
             users.add(user);
         }
         return users;
+    }
+    
+    public ArrayList<User> findAll() throws SQLException
+    {
+        ResultSet results = findAll.executeQuery();   
+        return getUsers(results);
+    }
+    
+    public User findById(int id) throws SQLException
+    {
+        findById.setInt(1, id);
+        ResultSet results = findById.executeQuery();
+        ArrayList<User> users = getUsers(results);
+        if (users.size() == 0)
+            throw new SQLException(String.format("User %d not found", id));
+        return users.get(0);
+    }
+    
+    public ArrayList<User> findByType(int type) throws SQLException
+    {
+        findByType.setInt(1, type);
+        ResultSet results = findByType.executeQuery();
+        return getUsers(results);
+    }
+    
+    public ArrayList<User> findByDivision(String division) throws SQLException
+    {
+        findByDivision.setString(1, division);
+        ResultSet results = findByDivision.executeQuery();
+        return getUsers(results);
     }
 }

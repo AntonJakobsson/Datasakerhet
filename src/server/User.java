@@ -9,12 +9,12 @@ public class User
     public final static int DOCTOR     = 3;
     public final static int GOVERNMENT = 4;
 
-    private int             id;
-    private int             type;
-    private String          name;
-    private String          division;
-    private String          password;
-    private String          salt;
+    private int    id;
+    private int    type;
+    private String name;
+    private String division;
+    private String password;
+    private String salt;
 
     /**
      * Konstruktor för att skapa en NY användare
@@ -75,7 +75,7 @@ public class User
      */
     public void setPassword(String password)
     {
-        this.salt = Security.generateSalt();
+        this.salt     = Security.generateSalt();
         this.password = Security.hash(password, this.salt);
     }
     
