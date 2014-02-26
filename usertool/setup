@@ -1,0 +1,10 @@
+#!/bin/bash
+
+openssl genrsa -out root-ca.key 1024
+openssl req -new -x509 -days 365 -key root-ca.key -out ca.crt
+keytool -import -noprompt -file ca.crt -alias CA -keystore servertruststore.store -dname "CN=root" -storepass password
+keytool -genkey -keypass password -alias keypair -keystore serverkeystore.store -dname "CN=root" -storepass password
+keytool -keystore serverkeystore.store -storepass password -certreq -alias keypair -file csr.csr
+openssl x509 -CA ca.crt -CAkey root-ca.key -req -in csr.csr -out signed.crt -set_serial 1
+keytool -keystore serverkeystore.store -storepass password -import -noprompt -file ca.crt -alias CA
+keytool -keystore serverkeystore.store -storepass password -import -noprompt -file signed.crt -alias keypair

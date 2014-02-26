@@ -39,7 +39,7 @@ public class Usertool
 				keyStore.load(new FileInputStream("Keystore"), "password".toCharArray());
 				KeyPair pair = generateKeyPair();
 				X509Certificate cert = generateCertificate(id, dn, division, pair);
-				
+//				keyStore.setKeyEntry("key"+id+"", pair.getPrivate(), password, chain);
 				keyStore.setCertificateEntry("CA", cert);
 				keyStore.store(new FileOutputStream("Keystore"), "password".toCharArray());
 			}

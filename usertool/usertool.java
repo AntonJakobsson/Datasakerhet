@@ -22,12 +22,13 @@ public class usertool
         User user = new User(type, name, division, password);
         db.users().insert(user);
 
-        System.out.println("User created.");
+        System.out.println("\nUser created.");
         System.out.println(String.format("  Type:     %s", User.typeString(user.getType())));
         System.out.println(String.format("  Name:     %s", user.getName()));
         System.out.println(String.format("  Division: %s", user.getDivision()));
         System.out.println(String.format("  Hash:     %s", user.getPassword()));
         System.out.println(String.format("  Salt:     %s", user.getSalt()));
+        System.out.println("\n");
 
         db.close();
         System.exit(user.getId());
@@ -35,7 +36,7 @@ public class usertool
 
     public static int getType(String type)
     {
-        switch(type.charAt(0)) {
+        switch(type.toLowerCase().charAt(0)) {
             case 'p': return User.PATIENT;
             case 'd': return User.DOCTOR;
             case 'n': return User.NURSE;

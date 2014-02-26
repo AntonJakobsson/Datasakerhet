@@ -1,4 +1,4 @@
 /build
-test.db
+*.db
 *.swp
 *.class
