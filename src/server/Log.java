@@ -8,24 +8,26 @@ import java.sql.Timestamp;
 public class Log
 {
     private static File log;
-    
-    public Log(){
+
+    public Log()
+    {
         log = new File("log.txt");
     }
-    
-    public static void write(String information){
+
+    public static void write(String information)
+    {
         Timestamp ts = new Timestamp(System.currentTimeMillis());
         StringBuilder sb = new StringBuilder();
         sb.append(ts);
-        sb.append("/n");
+        sb.append("\n");
         sb.append(information);
         try
         {
-            FileWriter fw = new FileWriter("log.txt",true);
+            FileWriter fw = new FileWriter(log, true);
             fw.write(sb.toString() + "\n");
             fw.close();
         }
-        catch(IOException ioe)
+        catch (IOException ioe)
         {
             System.err.println("IOException: " + ioe.getMessage());
         }

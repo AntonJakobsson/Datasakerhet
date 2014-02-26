@@ -16,7 +16,7 @@ public class EditButton extends JButton implements ActionListener
     @Override
     public void actionPerformed(ActionEvent arg0)
     {
-       //textArea.setEditable(true);
+        // textArea.setEditable(true);
 
     }
 
