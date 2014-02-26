@@ -1,10 +1,10 @@
 package GUI;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class mainWindow
 {
@@ -23,6 +23,8 @@ public class mainWindow
         deleteButton = new DeleteButton();
         editButton = new EditButton();
         textArea = new TextArea();
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        textArea.setEditable(false);
         infoBar = new InfoBar(getUser());
         
         JFrame frame = new JFrame("Awesome medical journal system");
@@ -38,12 +40,15 @@ public class mainWindow
     
     private void placeComponents(JPanel panel) {
         panel.setLayout(new BorderLayout());
-        
-        panel.add(newButton,BorderLayout.WEST);
-        panel.add(deleteButton,BorderLayout.WEST);
-        panel.add(editButton,BorderLayout.WEST);
-        panel.add(textArea,BorderLayout.EAST);
-        panel.add(infoBar,BorderLayout.NORTH);
+        panel.add(infoBar,BorderLayout.PAGE_START);
+        JPanel textAndButtonPanel = new JPanel(new BorderLayout());
+        panel.add(textAndButtonPanel,BorderLayout.PAGE_END);
+        JPanel buttonPanel = new JPanel(new BorderLayout());
+        buttonPanel.add(newButton,BorderLayout.NORTH);
+        buttonPanel.add(deleteButton,BorderLayout.EAST);
+        buttonPanel.add(editButton,BorderLayout.SOUTH);
+        textAndButtonPanel.add(buttonPanel, BorderLayout.WEST);
+        textAndButtonPanel.add(textArea,BorderLayout.EAST);
         
         
     }

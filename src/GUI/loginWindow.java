@@ -35,7 +35,7 @@ public class loginWindow
 
         panel.setLayout(null);
 
-        JLabel userLabel = new JLabel("Username");
+        JLabel userLabel = new JLabel("Username:");
         userLabel.setBounds(10, 10, 80, 25);
         panel.add(userLabel);
 
@@ -43,7 +43,7 @@ public class loginWindow
         userText.setBounds(100, 10, 160, 25);
         panel.add(userText);
 
-        JLabel passwordLabel = new JLabel("Password");
+        JLabel passwordLabel = new JLabel("Password:");
         passwordLabel.setBounds(10, 40, 80, 25);
         panel.add(passwordLabel);
 
