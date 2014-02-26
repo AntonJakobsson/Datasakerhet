@@ -23,5 +23,6 @@ public class PacketWriter
         buffer.putInt(packet.getCode());
         buffer.put(data);
         stream.write(buffer.array());
+        stream.flush(); /* Spola i strömmen */
     }
 }
