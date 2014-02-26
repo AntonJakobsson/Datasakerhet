@@ -43,6 +43,8 @@ public class User
         this.type = type;
         this.name = name;
         this.division = division;
+        this.password = password;
+        this.salt = salt;
     }
     
     public int getId() {
@@ -84,7 +86,7 @@ public class User
     }
     
     public String toString() {
-        return String.format("User %d: %s (%s, %s)", id, name, User.typeString(type), division);
+        return String.format("User %d: %s (%s, %s) %s %s", id, name, User.typeString(type), division, password, salt);
     }
     
     public static String typeString(int type) {

@@ -35,7 +35,7 @@ public class UserReplicator
         this.createUserTable.execute();
         
         this.insertUser = connection.prepareStatement(      
-            "INSERT INTO user (type, name, division, password, salt)" +
+            "INSERT INTO user (type, name, division, password, salt) " +
             "VALUES (?, ?, ?, ?, ?);", 
             Statement.RETURN_GENERATED_KEYS
         );
