@@ -1,6 +1,8 @@
 package GUI;
 
-public class DeleteButton
+import javax.swing.JButton;
+
+public class DeleteButton extends JButton
 {
 
 }

@@ -1,6 +1,8 @@
 package GUI;
 
-public class NewButton
+import javax.swing.JButton;
+
+public class NewButton extends JButton
 {
 
 }
