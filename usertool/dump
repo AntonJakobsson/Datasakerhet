@@ -1,0 +1,3 @@
+#!/bin/bash
+javac -sourcepath ".:../src" userdump.java
+java -classpath ".:../src:../lib/sqlite-jdbc-3.7.15-M1.jar" userdump

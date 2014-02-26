@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
+
 public class PacketWriter
 {
     BufferedOutputStream stream;
@@ -23,5 +24,6 @@ public class PacketWriter
         buffer.putInt(packet.getCode());
         buffer.put(data);
         stream.write(buffer.array());
+        stream.flush(); /* Spola i strömmen */
     }
 }

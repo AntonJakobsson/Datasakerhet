@@ -30,6 +30,11 @@ public class Record
         this.division = division;
         this.data = data;
     }
+    
+    public int getId()
+    {
+        return id;
+    }
 
     public String getPatientName()
     {

@@ -20,32 +20,37 @@ public class UserReplicator
     private PreparedStatement findByDivision;
 
     public UserReplicator(Connection connection) throws SQLException
-    { 
-        String tableQuery = "CREATE TABLE IF NOT EXISTS user (" + 
-                            "id INTEGER PRIMARY KEY autoincrement, " + 
-                            "type INTEGER, " + 
-                            "name VARCHAR(255), " + 
-                            "division VARCHAR(16), " + 
-                            "password VARCHAR(64), " +
-                            "salt VARCHAR(64));";
-        this.createUserTable = connection.prepareStatement(tableQuery);
+    {
+        this.createUserTable = connection.prepareStatement(
+            "CREATE TABLE IF NOT EXISTS user (" + 
+            "id INTEGER PRIMARY KEY autoincrement, " + 
+            "type INTEGER, " + 
+            "name VARCHAR(255), " + 
+            "division VARCHAR(32), " + 
+            "password VARCHAR(64), " +
+            "salt VARCHAR(64));"
+        );
+        
+        /* Make sure table exists */
         this.createUserTable.execute();
         
-        String insertQuery = "INSERT INTO user (type, name, division, password, salt)" +
-                             "VALUES (?, ?, ?, ?, ?);";
-        this.insertUser = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
-        
-        String findByDivisionQuery = "SELECT * FROM user u WHERE u.id=? ORDER BY u.id ASC";
-        this.findByDivision = connection.prepareStatement(findByDivisionQuery);
-        
-        String findAllQuery = "SELECT * FROM `user` u ORDER BY u.id  ASC";
-        this.findAll = connection.prepareStatement(findAllQuery);
-        
-        String findByIdQuery = "SELECT * FROM `user` u WHERE u.id=? LIMIT 1";
-        this.findById = connection.prepareStatement(findByIdQuery);
-    
-        String findByTypeQuery = "SELECT * FROM `user` u WHERE u.type=? ORDER BY u.id ASC";
-        this.findByType = connection.prepareStatement(findByTypeQuery);
+        this.insertUser = connection.prepareStatement(      
+            "INSERT INTO user (type, name, division, password, salt) " +
+            "VALUES (?, ?, ?, ?, ?);", 
+            Statement.RETURN_GENERATED_KEYS
+        );
+        this.findByDivision = connection.prepareStatement(
+            "SELECT * FROM user u WHERE u.id=? ORDER BY u.id ASC"
+        );
+        this.findAll = connection.prepareStatement(
+            "SELECT * FROM `user` u ORDER BY u.id ASC"
+        );
+        this.findById = connection.prepareStatement(
+            "SELECT * FROM `user` u WHERE u.id=? LIMIT 1"
+        );
+        this.findByType = connection.prepareStatement(
+            "SELECT * FROM `user` u WHERE u.type=? ORDER BY u.id ASC"
+        );
     }
     
     public void insert(User user) throws SQLException

@@ -4,21 +4,22 @@ import java.io.UnsupportedEncodingException;
 
 public class Packet
 {
+    public final static int AUTH       = 0x01;
+    public final static int MESSAGE    = 0x02;
+    public final static int QUERY_USER = 0x10;
+    public final static int QUERY_REC  = 0x11;
+    public final static int POST       = 0x20;
+    public final static int DELETE     = 0x21;
+    
     private int type;
     private int code;
-    private byte[] data;
+    private String data;
     
     public Packet(int type, int code, String data)
     {
         this.type = type;
         this.code = code;
-        try {
-            this.data = data.getBytes("UTF-8");
-        }
-        catch (UnsupportedEncodingException e) {
-            /* Not gonna happen... */
-            e.printStackTrace();
-        }
+        this.data = data;
     }
     
     public int getType() {
@@ -29,7 +30,18 @@ public class Packet
         return this.code;
     }
     
-    public byte[] getBytes() {
+    public String getString() {
         return this.data;
+    }
+    
+    public byte[] getBytes() {
+        try {
+            return this.data.getBytes("UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {
+            /* Not gonna happen... */
+            e.printStackTrace();
+        }
+        return new byte[0];
     }
 }

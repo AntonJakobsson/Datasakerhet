@@ -38,6 +38,13 @@ public class UserReplicatorTest
         ArrayList<User> users = rep.findAll();
         assertEquals(1, users.size());
         
+        User user2 = users.get(0);
+        
+        assertEquals(user.getName(),     user2.getName());
+        assertEquals(user.getDivision(), user2.getDivision());
+        assertEquals(user.getPassword(), user2.getPassword(), "Passwords dont match");
+        assertEquals(user.getSalt(),     user2.getSalt(),     "Salts dont match");
+        
         System.out.println(user);
     }
 }
