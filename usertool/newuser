@@ -1,4 +1,5 @@
 #!/bin/bash
+
 read -p "Name: " name
 read -p "Type (p/n/d): " type
 read -p "Division: " div
@@ -8,19 +9,13 @@ echo
 java -classpath ".:../src:../lib/sqlite-jdbc-3.7.15-M1.jar" usertool $type $name $div $password
 id=$?
 
-openssl genrsa -out key_$id.key 2048
-echo
-echo user ID: $id, enter as CN
-echo
-openssl req -new -subj '/C=SE/ST=Skåne/L=Lund/CN=$id' -x509 -days 365 -key key_$id.key -out cert_$id.crt
-keytool -import -noprompt -file cert_$id.crt -alias cert$id -keystore servertruststore.store -dname "CN=$id" -storepass password
-keytool -genkey -keypass password -alias key_$id -keystore serverkeystore.store -dname "CN=$id" -storepass password
-keytool -keystore serverkeystore.store -storepass password -certreq -alias key_$id -file $id.csr
-openssl x509 -CA ca.crt -CAkey root-ca.key -req -in $id.csr -out signed_$id.crt -set_serial 0$id
-keytool -keystore serverkeystore.store -storepass password -import -noprompt -file cert_$id.crt -alias cert_$id
-keytool -keystore serverkeystore.store -storepass password -import -noprompt -file signed_$id.crt -alias signed_$id
-
-keytool -import -noprompt -file ca.crt -alias CA -keystore clienttruststore.store -dname "CN=root" -storepass password
-keytool -keystore clientkeystore.store -dname "CN=$id" -storepass password -import -noprompt -file cert_$id.crt -alias cert_$id
-keytool -keystore clientkeystore.store -storepass password -import -noprompt -file signed_$id.crt -alias signed_$id
-tar -zcf client.tar.gz clientkeystore.store clienttruststore.store
+echo "Creating client certificate..."
+keytool -keystore client_trust.store -alias client -import -file ca.crt -storepass password -dname "CN=$id" -noprompt
+keytool -keystore client_key.store -alias client -genkey -storepass password -keypass password -dname "CN=$id"
+keytool -keystore client_key.store -alias client -certreq -keyalg rsa -file client.csr -storepass password
+openssl x509 -CA ca.crt -CAkey ca.key -req -in client.csr -out client.crt -set_serial 1
+keytool -keystore client_key.store -alias ca -import -file ca.crt -storepass password -noprompt
+keytool -keystore client_key.store -alias client -import -file client.crt -storepass password -noprompt
+rm client.csr
+tar -zcf client.tar.gz client_key.store client_trust.store
+echo "all done"

@@ -10,6 +10,7 @@ public class userdump
         Database db = new Database("../store.db");
         db.connect();
 
+        System.out.println("User list:");
         ArrayList<User> users = db.users().findAll();
         for(User user : users) {
             System.out.println(String.format("\n%s",           user.getName()));
@@ -17,8 +18,8 @@ public class userdump
             System.out.println(String.format("  Division: %s", user.getDivision()));
             System.out.println(String.format("  Hash:     %s", user.getPassword()));
             System.out.println(String.format("  Salt:     %s", user.getSalt()));
-            System.out.println("\n");
         }
+        System.out.println("");
 
         db.close();
     }

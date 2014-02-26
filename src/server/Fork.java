@@ -45,7 +45,7 @@ public class Fork implements Runnable
             while((packet = input.read()) != null) {
                 switch(packet.getType()) {
                     case Packet.AUTH:
-                        gson.fromJson(packet.getString(), AuthPacket.class);
+                        AuthPacket ap = gson.fromJson(packet.getString(), AuthPacket.class);
                         break;
                 }
             }
