@@ -1,2 +1,2 @@
 #!/bin/bash
-javac -sourcepath .:../src usertool.java
+javac -sourcepath ".:../src" usertool.java

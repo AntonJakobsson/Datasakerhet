@@ -26,7 +26,7 @@ public class UserReplicator
             "id INTEGER PRIMARY KEY autoincrement, " + 
             "type INTEGER, " + 
             "name VARCHAR(255), " + 
-            "division VARCHAR(16), " + 
+            "division VARCHAR(32), " + 
             "password VARCHAR(64), " +
             "salt VARCHAR(64));"
         );
