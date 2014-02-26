@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 public class Database
 {
+    private boolean connected;
     private String path;
     private Connection connection;
     private UserReplicator userReplicator;
@@ -36,6 +37,7 @@ public class Database
             e.printStackTrace();
             System.exit(-1);
         }
+        connected = true;
     }
     
     public void close()
@@ -44,13 +46,18 @@ public class Database
             this.connection.close();
         }
         catch (SQLException e) { }
+        connected = false;
     }
     
-    public UserReplicator users() {
+    public UserReplicator users() 
+    {
+        if (!connected) throw new  RuntimeException("Not connected to database");
         return this.userReplicator;
     }
     
-    public RecordReplicator records() {
+    public RecordReplicator records() 
+    {
+        if (!connected) throw new  RuntimeException("Not connected to database");
         return this.recordReplicator;
     }
 }
