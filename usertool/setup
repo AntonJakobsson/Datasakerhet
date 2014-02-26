@@ -1,7 +1,7 @@
 #!/bin/bash
 
 openssl genrsa -out root-ca.key 2048
-openssl req -new -x509 -days 365 -key root-ca.key -out ca.crt
+openssl req -new -subj '/C=SE/ST=Skåne/L=Lund/CN=root' -x509 -days 365 -key root-ca.key -out ca.crt
 keytool -import -noprompt -file ca.crt -alias CA -keystore servertruststore.store -dname "CN=root" -storepass password
 keytool -genkey -keypass password -alias keypair -keystore serverkeystore.store -dname "CN=root" -storepass password
 keytool -keystore serverkeystore.store -storepass password -certreq -alias keypair -file csr.csr
