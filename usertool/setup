@@ -1,10 +1,16 @@
 #!/bin/bash
+echo "Creating certificate authority..."
+openssl genrsa -out ca.key
+openssl req -new -key ca.key -out ca.csr -days 3650 -subj '/C=SE/ST=Skane/L=Lund/CN=root'
+openssl x509 -req -signkey ca.key -in ca.csr -out ca.crt
+rm ca.csr
 
-openssl genrsa -out root-ca.key 2048
-openssl req -new -subj '/C=SE/ST=Skåne/L=Lund/CN=root' -x509 -days 365 -key root-ca.key -out ca.crt
-keytool -import -noprompt -file ca.crt -alias CA -keystore servertruststore.store -dname "CN=root" -storepass password
-keytool -genkey -keypass password -alias keypair -keystore serverkeystore.store -dname "CN=root" -storepass password
-keytool -keystore serverkeystore.store -storepass password -certreq -alias keypair -file csr.csr
-openssl x509 -CA ca.crt -CAkey root-ca.key -req -in csr.csr -out signed.crt -set_serial 1
-keytool -keystore serverkeystore.store -storepass password -import -noprompt -file ca.crt -alias CA
-keytool -keystore serverkeystore.store -storepass password -import -noprompt -file signed.crt -alias keypair
+echo "Creating server certificate..."
+keytool -keystore server_trust.store -alias server -import -file ca.crt -storepass password -dname "CN=server" -noprompt
+keytool -keystore server_key.store -alias server -genkey -storepass password -keypass password -dname "CN=server"
+keytool -keystore server_key.store -alias server -certreq -keyalg rsa -file server.csr -storepass password
+openssl x509 -CA ca.crt -CAkey ca.key -req -in server.csr -out server.crt -set_serial 1
+keytool -keystore server_key.store -alias ca -import -file ca.crt -storepass password -noprompt
+keytool -keystore server_key.store -alias server -import -file server.crt -storepass password -noprompt
+rm server.csr
+

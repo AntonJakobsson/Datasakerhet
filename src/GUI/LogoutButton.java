@@ -5,19 +5,14 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 
-public class EditButton extends JButton implements ActionListener
+public class LogoutButton extends JButton implements ActionListener
 {
-
-    public EditButton()
-    {
-        super("Edit");
-    }
 
     @Override
     public void actionPerformed(ActionEvent arg0)
     {
-        // textArea.setEditable(true);
-
+        // TODO Auto-generated method stub
+        
     }
 
 }
