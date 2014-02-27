@@ -19,7 +19,7 @@ public class Log
         Timestamp ts = new Timestamp(System.currentTimeMillis());
         StringBuilder sb = new StringBuilder();
         sb.append(ts);
-        sb.append("\n");
+        sb.append(" : ");
         sb.append(information);
         try
         {
