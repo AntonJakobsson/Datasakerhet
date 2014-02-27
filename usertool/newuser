@@ -9,18 +9,15 @@ java -classpath ".:../src:../lib/sqlite-jdbc-3.7.15-M1.jar" usertool $type $name
 id=$?
 
 openssl genrsa -out key_$id.key 2048
-echo
-echo user ID: $id, enter as CN
-echo
 openssl req -new -subj '/C=SE/ST=Skåne/L=Lund/CN=$id' -x509 -days 365 -key key_$id.key -out cert_$id.crt
 keytool -import -noprompt -file cert_$id.crt -alias cert$id -keystore servertruststore.store -dname "CN=$id" -storepass password
 keytool -genkey -keypass password -alias key_$id -keystore serverkeystore.store -dname "CN=$id" -storepass password
 keytool -keystore serverkeystore.store -storepass password -certreq -alias key_$id -file $id.csr
 openssl x509 -CA ca.crt -CAkey root-ca.key -req -in $id.csr -out signed_$id.crt -set_serial 0$id
-keytool -keystore serverkeystore.store -storepass password -import -noprompt -file cert_$id.crt -alias cert_$id
+#keytool -keystore serverkeystore.store -storepass password -import -noprompt -file cert_$id.crt -alias cert_$id
 keytool -keystore serverkeystore.store -storepass password -import -noprompt -file signed_$id.crt -alias signed_$id
 
 keytool -import -noprompt -file ca.crt -alias CA -keystore clienttruststore.store -dname "CN=root" -storepass password
-keytool -keystore clientkeystore.store -dname "CN=$id" -storepass password -import -noprompt -file cert_$id.crt -alias cert_$id
+#keytool -keystore clientkeystore.store -dname "CN=$id" -storepass password -import -noprompt -file cert_$id.crt -alias cert_$id
 keytool -keystore clientkeystore.store -storepass password -import -noprompt -file signed_$id.crt -alias signed_$id
 tar -zcf client.tar.gz clientkeystore.store clienttruststore.store
