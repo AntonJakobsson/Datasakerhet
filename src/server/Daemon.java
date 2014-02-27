@@ -11,15 +11,18 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 
+import server.data.Database;
+
 public class Daemon
 {
     int port;
     SSLServerSocket socket;
+    Database db;
     
     public Daemon() {
     }
     
-    public void listen(int port)
+    public void listen(int port) throws IOException
     {
         this.port = port;
         try {
@@ -31,6 +34,9 @@ public class Daemon
             e.printStackTrace();
         }
         System.out.println(String.format("Listening on port %d... (SSL)", port));
+        
+        while(true)
+        	fork();
     }
     
     public void fork() throws IOException

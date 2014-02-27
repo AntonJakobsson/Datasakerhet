@@ -1,5 +1,7 @@
 package server;
 
+import java.io.IOException;
+
 public class Server
 {
     public static void main(String args[]) 
@@ -12,6 +14,14 @@ public class Server
         }
         
         Daemon d = new  Daemon();
-        d.listen(port);
+        
+        try
+		{
+			d.listen(port);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
     }
 }
