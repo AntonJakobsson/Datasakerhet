@@ -13,3 +13,4 @@ openssl x509 -CA ca.crt -CAkey ca.key -req -in server.csr -out server.crt -set_s
 keytool -keystore server_key.store -alias ca -import -file ca.crt -storepass password -noprompt
 keytool -keystore server_key.store -alias server -import -file server.crt -storepass password -noprompt
 rm server.csr
+

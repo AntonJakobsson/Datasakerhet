@@ -19,3 +19,4 @@ keytool -keystore client_key.store -alias client -import -file client.crt -store
 rm client.csr
 tar -zcf client.tar.gz client_key.store client_trust.store
 echo "all done"
+
