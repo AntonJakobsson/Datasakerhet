@@ -1,6 +1,5 @@
-package server;
+package common;
 
-import common.Security;
 
 public class User
 {
@@ -86,7 +85,7 @@ public class User
     }
     
     public String toString() {
-        return String.format("User %d: %s (%s, %s) %s %s", id, name, User.typeString(type), division, password, salt);
+        return String.format("User %d: %s (%s, %s)", id, name, User.typeString(type), division);
     }
     
     public static String typeString(int type) {

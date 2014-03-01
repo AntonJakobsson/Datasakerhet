@@ -15,11 +15,14 @@ import server.data.Database;
 
 public class Daemon
 {
-    int port;
-    SSLServerSocket socket;
-    Database db;
+    protected int port;
+    protected SSLServerSocket socket;
+    protected Database db;
     
-    public Daemon() {
+    public Daemon() 
+    {
+        this.db = new Database("store.db");
+        this.db.connect();
     }
     
     public void listen(int port) throws IOException
@@ -60,8 +63,8 @@ public class Daemon
             /* The legendary password */
             char[] password = "password".toCharArray();
 
-            ks.load(new FileInputStream("serverkey.store"),   password); // keystore password (storepass)
-            ts.load(new FileInputStream("servertrust.store"), password); // truststore password (storepass)
+            ks.load(new FileInputStream("server_key.store"),   password); // keystore password (storepass)
+            ts.load(new FileInputStream("server_trust.store"), password); // truststore password (storepass)
             System.out.println("Key & Trust stores loaded");
             
             kmf.init(ks, password); // certificate password (keypass)

@@ -6,7 +6,7 @@ read -p "Division: " div
 echo -n "Password: " 
 read -s password
 echo
-java -classpath ".:../src:../lib/sqlite-jdbc-3.7.15-M1.jar" usertool $type $name $div $password
+java -classpath ".:../src:../lib/sqlite-jdbc-3.7.15-M1.jar" usertool "$type" "$name" "$div" "$password"
 id=$?
 
 echo "Creating client certificate..."

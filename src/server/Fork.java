@@ -16,6 +16,7 @@ import common.Packet;
 import common.PacketReader;
 import common.PacketWriter;
 import common.Security;
+import common.User;
 import common.packets.AuthPacket;
 
 public class Fork implements Runnable
@@ -29,13 +30,16 @@ public class Fork implements Runnable
     PacketWriter output;
     Database db;
     
+    User user;
+    boolean authenticated;
+    
     public Fork(Daemon daemon, SSLSocket socket) throws SSLPeerUnverifiedException
     {
         this.server = daemon;
         this.socket = socket;
         this.session = socket.getSession();
         this.cert = (X509Certificate)session.getPeerCertificateChain()[0];
-        db = daemon.db;
+        this.db = daemon.db;
         System.out.println(String.format("Accepted connection from %s", socket.getInetAddress()));
     }
 
@@ -47,8 +51,16 @@ public class Fork implements Runnable
             this.input  = new PacketReader(this.socket.getInputStream());
             this.output = new PacketWriter(this.socket.getOutputStream());
             
-            Packet packet;
-            while((packet = input.read()) != null) {
+            output.write(new Packet(Packet.MESSAGE, 0, "Welcome lol"));
+            
+            int user_id = this.getUserIdFromCert(cert);
+            this.user = db.users().findById(user_id);
+            
+            System.out.println("Certificate holder: " + user.toString());
+            
+            while(socket.isConnected()) 
+            {
+                Packet packet = input.read();
                 switch(packet.getType()) {
                     case Packet.AUTH:
                         AuthPacket ap = gson.fromJson(packet.getString(), AuthPacket.class);
@@ -81,9 +93,7 @@ public class Fork implements Runnable
             }
         }
         catch (IOException e) {
-            // TODO Auto-generated catch block
             System.out.println("Client disconnected! Error: " + e.getMessage());
-            e.printStackTrace();
         }
 		catch (SQLException e)
 		{
@@ -139,5 +149,36 @@ public class Fork implements Runnable
     public void close()
     {
         System.out.println("Connection lost");
+    }
+    
+    public void write(Packet packet) 
+    {
+        try {
+            output.write(packet);
+        }
+        catch(IOException ex) {
+            System.out.println("Write error: " + ex.getMessage());
+            close();
+        }
+    }
+    
+    protected boolean ensureAuth(int userType) 
+    {
+        if (!authenticated) {
+            write(new Packet(Packet.MESSAGE, 0, "Not authenticated"));
+            return false;
+        }
+        return true;
+    }
+    
+    protected int getUserIdFromCert(X509Certificate cert) 
+    {
+        try {
+            String user_string = cert.getSubjectDN().getName();
+            return Integer.parseInt(user_string.substring(user_string.indexOf("=") + 1));
+        }
+        catch(NumberFormatException ex) {
+            return -1;
+        }
     }
 }

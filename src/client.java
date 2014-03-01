@@ -70,8 +70,8 @@ public class client {
             System.out.println("secure connection established\n\n");
 
             BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter    out  = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in   = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String msg;
 			for (;;) {
                 System.out.print(">");
