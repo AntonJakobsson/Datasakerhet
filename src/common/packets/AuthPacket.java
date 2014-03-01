@@ -1,8 +1,13 @@
 package common.packets;
 
+
 public class AuthPacket
 {
-    private int id;
+	public final static int ACCEPT = 0x50;
+    public final static int DECLINE = 0x51;
+    public final static int ERROR = 0x60;
+	
+	private int id;
     private String password;
 
     public AuthPacket(int id, String password)
