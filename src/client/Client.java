@@ -2,7 +2,9 @@ package client;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.security.KeyStore;
+import java.util.ArrayList;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -12,25 +14,37 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.security.cert.X509Certificate;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import common.Packet;
 import common.PacketReader;
 import common.PacketWriter;
+import common.User;
 
 public class Client implements Runnable
 {
     protected String host;
     protected int port;
+    protected boolean ready;
     protected SSLSocket socket;
     protected SSLSession session;
     protected X509Certificate cert;
     
+    protected Gson gson;
     protected PacketReader input;
     protected PacketWriter output;
+    protected NetworkState state;
     
     public Client(String host, int port)
     {
         this.host = host;
         this.port = port;
+        this.state = new NetworkState(this);
+        this.gson = new Gson();
+    }
+    
+    public NetworkState getState() {
+        return state;
     }
     
     @Override
@@ -41,12 +55,20 @@ public class Client implements Runnable
             
             this.input  = new PacketReader(socket.getInputStream());
             this.output = new PacketWriter(socket.getOutputStream());
+            this.ready  = true;
             
-            while(socket.isConnected()) {
+            while(socket.isConnected()) 
+            {
                 Packet packet = input.read();
                 switch(packet.getType()) {
                     case Packet.MESSAGE:
                         handleMessage(packet.getString());
+                        break;
+                    case Packet.AUTH:
+                        handleAuth(packet);
+                        break;
+                    case Packet.QUERY_USER:
+                        handleQueryUser(packet);
                         break;
                 }
             }
@@ -64,6 +86,26 @@ public class Client implements Runnable
     protected void handleMessage(String message)
     {
         System.out.println("<< " + message);
+    }
+    
+    protected void handleAuth(Packet packet)
+    {
+        if (packet.getCode() == Packet.SUCCESS) {
+            User user = gson.fromJson(packet.getString(), User.class);
+            System.out.println("Authenticated as " + user);
+            state.setUser(user);
+        }
+        else {
+            System.out.println("Authentication failed");
+            state.setUser(new User.None());
+        }
+    }
+    
+    protected void handleQueryUser(Packet packet)
+    {
+        Type listType = new TypeToken<ArrayList<User>>() { }.getType();
+        ArrayList<User> list = gson.fromJson(packet.getString(), listType);
+        state.setQueryUsers(list);
     }
     
     /* Socket functions */
@@ -90,6 +132,7 @@ public class Client implements Runnable
     
     public void close()
     {
+        this.ready = false;
         if (socket == null) return;
         try {
             socket.close();
@@ -97,6 +140,11 @@ public class Client implements Runnable
         catch(IOException ex) {
             /* silence */
         }
+    }
+    
+    public boolean isConnected()
+    {
+        return this.ready;
     }
 
     protected SSLSocket getSocket(String host, int port) throws IOException

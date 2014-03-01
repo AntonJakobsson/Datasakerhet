@@ -1,3 +1,4 @@
+import common.*;
 import server.*;
 import server.data.*;
 import java.sql.SQLException;
@@ -23,9 +24,11 @@ public class usertool
         db.users().insert(user);
 
         System.out.println("\nUser created.");
+        System.out.println(String.format("  ID:       %d", user.getId()));
         System.out.println(String.format("  Type:     %s", User.typeString(user.getType())));
         System.out.println(String.format("  Name:     %s", user.getName()));
         System.out.println(String.format("  Division: %s", user.getDivision()));
+        System.out.println(String.format("  Password: '%s'", password));
         System.out.println(String.format("  Hash:     %s", user.getPassword()));
         System.out.println(String.format("  Salt:     %s", user.getSalt()));
         System.out.println("\n");

@@ -1,5 +1,9 @@
 package client;
 
+import java.util.ArrayList;
+
+import common.User;
+
 public class Main
 {
     public static void main(String[] args)
@@ -22,5 +26,19 @@ public class Main
         Client client = new Client(host, port);
         Thread networkThread = new Thread(client);
         networkThread.start();
+        
+        try {
+            while(!client.isConnected())
+                Thread.sleep(50);
+            
+            NetworkState state = client.getState();
+            
+            ArrayList<User> users = state.queryUsers(User.PATIENT);
+            for(User u : users)
+                System.out.println(u);
+        }
+        catch(InterruptedException ex) {
+            ex.printStackTrace();
+        }
     }
 }

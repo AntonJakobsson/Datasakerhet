@@ -2,6 +2,7 @@ package server;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
@@ -11,13 +12,11 @@ import javax.security.cert.X509Certificate;
 import server.data.Database;
 
 import com.google.gson.Gson;
-
 import common.Packet;
 import common.PacketReader;
 import common.PacketWriter;
 import common.Security;
 import common.User;
-import common.packets.AuthPacket;
 
 public class Fork implements Runnable
 {
@@ -29,6 +28,7 @@ public class Fork implements Runnable
     PacketReader input;
     PacketWriter output;
     Database db;
+    Gson gson;
     
     User user;
     boolean authenticated;
@@ -40,13 +40,13 @@ public class Fork implements Runnable
         this.session = socket.getSession();
         this.cert = (X509Certificate)session.getPeerCertificateChain()[0];
         this.db = daemon.db;
+        this.gson = new Gson();
         System.out.println(String.format("Accepted connection from %s", socket.getInetAddress()));
     }
 
     @Override
     public void run()
     {
-        Gson gson = new Gson();
         try {
             this.input  = new PacketReader(this.socket.getInputStream());
             this.output = new PacketWriter(this.socket.getOutputStream());
@@ -63,8 +63,7 @@ public class Fork implements Runnable
                 Packet packet = input.read();
                 switch(packet.getType()) {
                     case Packet.AUTH:
-                        AuthPacket ap = gson.fromJson(packet.getString(), AuthPacket.class);
-                        handleAuthPacket(ap);
+                        handleAuthPacket(packet.getString());
                         break;
                     case Packet.DELETE: {
                     	User u = gson.fromJson(packet.getString(), User.class);
@@ -86,7 +85,7 @@ public class Fork implements Runnable
                     	break;
                     }
                     case Packet.QUERY_USER: {
-                    	Packet p = gson.fromJson(packet.getString(), Packet.class);
+                    	handleQueryUsers(packet.getCode());
                     	break;
                     }
                 }
@@ -116,6 +115,18 @@ public class Fork implements Runnable
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private void handleQueryUsers(int type)
+	{
+	    try {
+	        // TODO Security levelz
+            ArrayList<User> results = db.users().findByType(type);
+            write(new Packet(Packet.QUERY_USER, results.size(), gson.toJson(results)));
+        }
+        catch (SQLException e) {
+            
+        }
+	}
 
 	private void addPost(User user)
 	{
@@ -129,26 +140,35 @@ public class Fork implements Runnable
     
 	}
 
-	private void handleAuthPacket(AuthPacket packet) throws SQLException, IOException
+	private void handleAuthPacket(String password) throws SQLException, IOException
     {
-    	User u = db.users().findById(packet.getId());
-    	String hash = Security.hash(packet.getPassword(), u.getSalt());
-    	String message = "";
-    	int code = -1;
-    	if (hash.equals(u.getPassword())) {
-    		message = "Authentication successful";
-    		code = 0; //Not defined
+    	String hash = Security.hash(password, user.getSalt());
+    	String message;
+    	int    code;
+    	
+    	if (hash.equals(user.getPassword())) {
+    		message = gson.toJson(user);
+    		code = Packet.SUCCESS;
+    		this.authenticated = true;
     	} else {
     		message = "Invalid username or password";
-    		code = 1; //Not defined
+    		code = Packet.ERROR;
+    		this.authenticated = false;
     	}
+    	
     	Packet p = new Packet(Packet.AUTH, code, message);
     	output.write(p);
     }
     
     public void close()
     {
-        System.out.println("Connection lost");
+        if (this.socket == null) return;
+        try {
+            socket.close();
+        }
+        catch(IOException ex) {
+            /* silence */
+        }
     }
     
     public void write(Packet packet) 

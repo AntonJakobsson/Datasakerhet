@@ -1,19 +1,22 @@
 package common;
 
 import com.google.gson.Gson;
-import common.packets.AuthPacket;
 
 public class PacketFactory
 {
-    public static Packet auth(int id, String password) 
+    public static Packet auth(String password) 
     {
-        AuthPacket ap = new AuthPacket(id, password);
-        return new Packet(Packet.AUTH, 0, gson().toJson(ap));
+        return new Packet(Packet.AUTH, 0, password);
     }
     
-    public static Packet message(int code, String message) 
+    public static Packet message(String message) 
     {
-        return new Packet(Packet.MESSAGE, code, message);
+        return new Packet(Packet.MESSAGE, 0, message);
+    }
+    
+    public static Packet queryUsers(int type)
+    {
+        return new Packet(Packet.QUERY_USER, type, "");
     }
     
     /* Singleton GSON */

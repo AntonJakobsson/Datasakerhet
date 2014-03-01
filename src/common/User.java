@@ -12,8 +12,8 @@ public class User
     private int    type;
     private String name;
     private String division;
-    private String password;
-    private String salt;
+    private transient String password;
+    private transient String salt;
 
     /**
      * Konstruktor för att skapa en NY användare
@@ -95,6 +95,13 @@ public class User
             case User.DOCTOR:     return "Doctor";
             case User.GOVERNMENT: return "Government Agency";
             default:              return "Invalid";
+        }
+    }
+    
+    public static class None extends User
+    {
+        public None() {
+            super(0, 0, "Not logged in", "", "", "");
         }
     }
 }

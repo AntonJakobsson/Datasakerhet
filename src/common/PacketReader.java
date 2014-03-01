@@ -15,24 +15,26 @@ public class PacketReader
         this.stream = new BufferedInputStream(stream);
     }
     
-    public Packet read() throws IOException
+    protected byte[] readBytes(int length) throws IOException
     {
-        byte[] length_bytes = new byte[4];
-        int r = stream.read(length_bytes);
-        if (r < 0) throw new IOException("Connection closed");
-        if (r < 4) throw new IOException("Could not read packet length");
-        
-        ByteBuffer length_buffer = ByteBuffer.wrap(length_bytes);
-        int length = length_buffer.getInt();
         int offset = 0;
-       
         byte[] bytes = new byte[length];
         while(offset < length) {
             int read = stream.read(bytes, offset, length - offset);
             if (read < 0) throw new IOException("Connection closed");
             offset += read;
         }
+        return bytes;
+    }
+    
+    public Packet read() throws IOException
+    {
+        byte[] length_bytes = readBytes(4);
         
+        ByteBuffer length_buffer = ByteBuffer.wrap(length_bytes);
+        int length = length_buffer.getInt();
+
+        byte[] bytes = readBytes(length);        
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         int type = buffer.getInt();
         int code = buffer.getInt();

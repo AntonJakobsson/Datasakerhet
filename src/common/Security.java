@@ -45,7 +45,7 @@ public class Security
      */
     public static String hash(String password, String salt) 
     {
-        int iterations = 100000;
+        int iterations = 1000;
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = (password + salt).getBytes("UTF-8");
