@@ -105,7 +105,7 @@ public class Client implements Runnable
     {
         Type listType = new TypeToken<ArrayList<User>>() { }.getType();
         ArrayList<User> list = gson.fromJson(packet.getString(), listType);
-        state.setQueryUsers(list);
+        state.setUserList(list);
     }
     
     /* Socket functions */

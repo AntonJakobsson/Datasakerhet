@@ -89,6 +89,22 @@ public class UserReplicator
         return users;
     }
     
+    /**
+     * Kontrollerar att ett användar-id finns i databasen
+     * @param id
+     * @return
+     */
+    public boolean exists(int id)
+    {
+    	try {
+    		findById(id);
+    		return true;
+    	}
+    	catch(SQLException ex) {
+    		return false;
+    	}
+    }
+    
     public ArrayList<User> findAll() throws SQLException
     {
         ResultSet results = findAll.executeQuery();   

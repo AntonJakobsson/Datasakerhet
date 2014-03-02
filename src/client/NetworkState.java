@@ -3,6 +3,7 @@ package client;
 import java.util.ArrayList;
 
 import common.PacketFactory;
+import common.Record;
 import common.User;
 
 public class NetworkState
@@ -10,6 +11,7 @@ public class NetworkState
     private Client client;
     private User user = new User.None();
     private ArrayList<User> queryUserList;
+    private ArrayList<Record> queryRecordList;
     
     public NetworkState(Client client) 
     {
@@ -34,6 +36,8 @@ public class NetworkState
         return user.getType() != 0;
     }
     
+    /* User Query */
+    
     public synchronized ArrayList<User> queryUsers(int type) throws InterruptedException
     {
         this.queryUserList = null;
@@ -43,9 +47,25 @@ public class NetworkState
         return queryUserList;
     }
     
-    public synchronized void setQueryUsers(ArrayList<User> list)
+    public synchronized void setUserList(ArrayList<User> list)
     {
         this.queryUserList = list;
         notifyAll();
+    }
+    
+    /* Record Query */
+    
+    public synchronized ArrayList<Record> queryRecords(User user) throws InterruptedException
+    {
+    	this.queryRecordList = null;
+    	client.write(PacketFactory.queryRecords(user));
+    	while(queryRecordList == null)
+    		wait();
+    	return queryRecordList;
+    }
+    
+    public synchronized void setRecordList(ArrayList<Record> list)
+    {
+    	this.queryRecordList = list;
     }
 }
