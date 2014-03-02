@@ -12,9 +12,12 @@ import javax.security.cert.X509Certificate;
 import server.data.Database;
 
 import com.google.gson.Gson;
+
 import common.Packet;
+import common.PacketFactory;
 import common.PacketReader;
 import common.PacketWriter;
+import common.Record;
 import common.Security;
 import common.User;
 
@@ -47,7 +50,8 @@ public class Fork implements Runnable
     @Override
     public void run()
     {
-        try {
+        try 
+        {
             this.input  = new PacketReader(this.socket.getInputStream());
             this.output = new PacketWriter(this.socket.getOutputStream());
             
@@ -61,27 +65,24 @@ public class Fork implements Runnable
             while(socket.isConnected()) 
             {
                 Packet packet = input.read();
-                switch(packet.getType()) {
-                    case Packet.AUTH:
+                switch(packet.getType()) 
+                {
+                    case Packet.AUTH: {
                         handleAuthPacket(packet.getString());
                         break;
-                    case Packet.DELETE: {
-                    	User u = gson.fromJson(packet.getString(), User.class);
-                    	deletePost(u);
-                    	break;
                     }
-                    case Packet.MESSAGE: {
-                    	handleMessage(packet.getString());
+                    case Packet.DELETE: {
+                    	Record record = gson.fromJson(packet.getString(), Record.class);
+                    	deletePost(record);
                     	break;
-                    }                    	
+                    }                  	
                     case Packet.POST: {
-                    	User u = gson.fromJson(packet.getString(), User.class);
-                    	addPost(u);
+                    	Record record = gson.fromJson(packet.getString(), Record.class);
+                    	addPost(record);
                     	break;
                     }
                     case Packet.QUERY_REC: {                    	
-                    	Packet p = gson.fromJson(packet.getString(), Packet.class);
-                    	queryRecord(p);
+                    	handleQueryRecord(packet);
                     	break;
                     }
                     case Packet.QUERY_USER: {
@@ -92,11 +93,11 @@ public class Fork implements Runnable
             }
         }
         catch (IOException e) {
-            System.out.println("Client disconnected! Error: " + e.getMessage());
+            System.out.println("Client disconnected");
         }
 		catch (SQLException e)
 		{
-			// TODO Auto-generated catch block
+			System.out.println("Caught SQL Exception in network loop :S");
 			e.printStackTrace();
 		}
         finally {
@@ -104,40 +105,67 @@ public class Fork implements Runnable
         }
     }
     
-    private void handleMessage(String string)
+    private void handleQueryUsers(int type)
 	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void queryRecord(Packet p)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-	
-	private void handleQueryUsers(int type)
-	{
+		ensureAuth();
+		ArrayList<User> results;
 	    try {
 	        // TODO Security levelz
-            ArrayList<User> results = db.users().findByType(type);
-            write(new Packet(Packet.QUERY_USER, results.size(), gson.toJson(results)));
+            results = db.users().findByType(type);
         }
         catch (SQLException e) {
-            
+        	System.out.println("handleQueryUsers SQL Exception:");
+        	e.printStackTrace();
+            results = new ArrayList<User>();
+        }	
+	    write(PacketFactory.queryUsersReply(results));
+	}
+
+	private void handleQueryRecord(Packet p)
+	{
+		ensureAuth();
+		ArrayList<Record> results;
+		try {
+	        // TODO Security levelz
+			User user = db.users().findById(p.getCode());
+            results = db.records().findByUser(user);
         }
+        catch (SQLException e) {
+        	System.out.println("handleQueryRecord SQL Exception:");
+        	e.printStackTrace();
+            results = new ArrayList<Record>();
+        }	
+		write(PacketFactory.queryRecordsReply(results));
 	}
 
-	private void addPost(User user)
+	private void addPost(Record record)
 	{
-		// TODO Auto-generated method stub
-		
+		ensureAuth();
+		try {
+			// TODO maddafackin security
+			if (db.records().exists(record.getId())) {
+				db.records().update(record);
+			}
+			else {
+				db.records().insert(record);
+			}
+		}
+		catch(SQLException ex) {
+			System.out.println("addPost SQL exception:");
+			ex.printStackTrace();
+		}
 	}
 
-	private void deletePost(User u)
+	private void deletePost(Record record)
 	{
-    	// remove post from database i.e. db.delete(p.getID());
-    
+		ensureAuth();
+		try {
+			db.records().delete(record);
+		}
+		catch(SQLException ex) {
+			System.out.println("SQL Exception from deletePost():");
+			ex.printStackTrace();
+		}
 	}
 
 	private void handleAuthPacket(String password) throws SQLException, IOException
@@ -151,7 +179,8 @@ public class Fork implements Runnable
     		message = gson.toJson(user);
     		code = Packet.SUCCESS;
     		this.authenticated = true;
-    	} else {
+    	} 
+    	else {
     		message = "Invalid username or password";
     		code = Packet.ERROR;
     		this.authenticated = false;
@@ -183,7 +212,7 @@ public class Fork implements Runnable
         }
     }
     
-    protected boolean ensureAuth(int userType) 
+    protected boolean ensureAuth() 
     {
         if (!authenticated) {
             write(new Packet(Packet.MESSAGE, 0, "Not authenticated"));

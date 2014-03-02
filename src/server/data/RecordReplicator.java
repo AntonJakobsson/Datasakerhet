@@ -47,7 +47,7 @@ public class RecordReplicator
         );
         this.updateRecord = connection.prepareStatement(
         	"UPDATE `records` SET " +
-        	"data=? "+
+        	"data=? " +
         	"WHERE id=?"
         );
     }
@@ -86,6 +86,17 @@ public class RecordReplicator
     	updateRecord.setString(1, record.getData());
     	updateRecord.setInt(2,    record.getId());
     	updateRecord.execute();
+    }
+    
+    public boolean exists(int id)
+    {
+    	try {
+    		findById(id);
+    		return true;
+    	}
+    	catch(SQLException ex) {
+    		return false;
+    	}
     }
     
     public void delete(Record record) throws SQLException

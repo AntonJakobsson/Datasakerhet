@@ -15,13 +15,16 @@ import server.data.Database;
 
 public class Daemon
 {
+	public final static String KEYSTORE = "server_key.store";
+	public final static String TRUSTSTORE = "server_trust.store";
+	
     protected int port;
     protected SSLServerSocket socket;
     protected Database db;
     
     public Daemon() 
     {
-        this.db = new Database("store.db");
+        this.db = new Database(Database.FILE);
         this.db.connect();
     }
     
@@ -63,8 +66,8 @@ public class Daemon
             /* The legendary password */
             char[] password = "password".toCharArray();
 
-            ks.load(new FileInputStream("server_key.store"),   password); // keystore password (storepass)
-            ts.load(new FileInputStream("server_trust.store"), password); // truststore password (storepass)
+            ks.load(new FileInputStream(KEYSTORE),   password); // keystore password (storepass)
+            ts.load(new FileInputStream(TRUSTSTORE), password); // truststore password (storepass)
             System.out.println("Key & Trust stores loaded");
             
             kmf.init(ks, password); // certificate password (keypass)

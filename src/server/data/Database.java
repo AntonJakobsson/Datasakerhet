@@ -6,6 +6,8 @@ import java.sql.SQLException;
 
 public class Database
 {
+	public final static String FILE = "store.db";
+	
     private boolean connected;
     private String path;
     private Connection connection;

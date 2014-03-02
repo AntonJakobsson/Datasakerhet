@@ -1,6 +1,5 @@
 package common;
 
-
 public class User
 {
     public final static int PATIENT    = 1;
