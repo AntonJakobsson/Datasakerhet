@@ -8,10 +8,18 @@ import java.sql.Timestamp;
 public class Log
 {
     private static File log;
+    private static FileWriter writer;
 
-    public Log()
+    public static void open()
     {
         log = new File("log.txt");
+        try {
+        	writer = new FileWriter(log, true);
+		} catch (IOException e) {
+			System.out.println("Error opening log file for writing!");
+			e.printStackTrace();
+			System.exit(-1);
+		}
     }
 
     public static void write(String information)
@@ -23,9 +31,7 @@ public class Log
         sb.append(information);
         try
         {
-            FileWriter fw = new FileWriter(log, true);
-            fw.write(sb.toString() + "\n");
-            fw.close();
+            writer.write(sb.toString() + "\n");
         }
         catch (IOException ioe)
         {

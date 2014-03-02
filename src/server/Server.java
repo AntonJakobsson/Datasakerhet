@@ -13,6 +13,7 @@ public class Server
             port = Integer.parseInt(args[0]);
         }
         
+        Log.open();
         Daemon d = new  Daemon();
         
         try

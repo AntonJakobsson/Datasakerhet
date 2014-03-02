@@ -2,7 +2,12 @@ package client;
 
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import client.gui.LoginWindow;
+import client.gui.SelectUserWindow;
+
+import common.Record;
 import common.User;
 
 public class Main
@@ -34,7 +39,29 @@ public class Main
 		while(loginWindow.showDialog() == 0)
 		{
 			String password = loginWindow.getPassword();
+			
+			User currentUser;
+			try { currentUser = state.auth(password); }
+			catch(AccessDeniedException ex) 
+			{
+				JOptionPane.showMessageDialog(null, ex.getMessage(), "Authentication failed", JOptionPane.ERROR_MESSAGE);
+				/* Hoppa tillbaks till login */
+				continue;
+			}
+			
+			ArrayList<User> patients = state.queryUsers(User.PATIENT);
+			SelectUserWindow selectUser = new SelectUserWindow(currentUser, patients);
+			while(selectUser.showDialog() == 0) 
+			{
+				User selectedPatient = selectUser.getSelectedUser();
+				
+				System.out.println("You have selected " + selectedPatient);
+			}			
 		}
+		
+		/* die */
+		client.close();
+		System.exit(0);
 	}
 	
     public static void main(String[] args)
