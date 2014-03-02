@@ -1,5 +1,6 @@
 package client.gui;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -14,6 +15,7 @@ public class EditWindow extends JPanel
 
     protected Record record;
     protected JTextArea textArea;
+    protected JLabel userLabel;
     
     public EditWindow(Record record)
     {
@@ -23,11 +25,13 @@ public class EditWindow extends JPanel
 
     protected void setup()
     {
+        userLabel = new JLabel("Record of Patient: " + record.getPatientName());
         textArea = new JTextArea(record.getData());
         JScrollPane scroll = new JScrollPane(textArea);
         textArea.setEditable(true);
         textArea.setSize(500,300);
         
+        this.add(userLabel);
         this.add(scroll);
         this.add(textArea);
     }
