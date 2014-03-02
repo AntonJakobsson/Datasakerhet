@@ -38,25 +38,31 @@ public class NetworkState
         return this.user;
     }
     
-    public synchronized User auth(String password) throws InterruptedException 
+    public synchronized User auth(String password) 
     {
     	this.error = false;
         this.user = null;
         client.write(PacketFactory.auth(password));
-        while(this.user == null || error) wait();
-        if (error) throw new RuntimeException(err_message);
+        while(this.user == null && !error) { 
+        	try { wait(); } 
+        	catch(InterruptedException ex) { }
+        }
+        if (error) throw new AccessDeniedException(err_message);
         return this.user;
     }
     
     /* User Query */
     
-    public synchronized ArrayList<User> queryUsers(int type) throws InterruptedException
+    public synchronized ArrayList<User> queryUsers(int type)
     {
     	this.error = false;
         this.queryUserList = null;
         client.write(PacketFactory.queryUsers(type));
-        while(this.queryUserList == null || error) wait();
-        if (error) throw new RuntimeException(err_message);
+        while(this.queryUserList == null && !error) { 
+        	try { wait(); } 
+        	catch(InterruptedException ex) { }
+        }
+        if (error) throw new AccessDeniedException(err_message);
         return queryUserList;
     }
     
@@ -68,13 +74,16 @@ public class NetworkState
     
     /* Record Query */
     
-    public synchronized ArrayList<Record> queryRecords(User user) throws InterruptedException
+    public synchronized ArrayList<Record> queryRecords(User user)
     {
     	this.error = false;
     	this.queryRecordList = null;
     	client.write(PacketFactory.queryRecords(user));
-    	while(queryRecordList == null || error) wait();
-    	if (error) throw new RuntimeException(err_message);
+    	while(queryRecordList == null && !error) { 
+    		try { wait(); } 
+    		catch(InterruptedException ex) { }
+    	}
+    	if (error) throw new AccessDeniedException(err_message);
     	return queryRecordList;
     }
     
@@ -86,25 +95,31 @@ public class NetworkState
     
     /* Post Record */
     
-    public synchronized Record postRecord(Record record) throws InterruptedException
+    public synchronized Record postRecord(Record record)
     {
     	this.error = false;
     	this.record = null;
     	client.write(PacketFactory.postRecord(record));
-    	while(this.record == null || error) wait();
-    	if (error) throw new RuntimeException(err_message);
+    	while(this.record == null && !error) {
+    		try { wait(); } 
+    		catch(InterruptedException ex) { }
+    	}
+    	if (error) throw new AccessDeniedException(err_message);
     	return this.record;
     }
     
     /* Delete Record */
     
-    public synchronized void deleteRecord(Record record) throws InterruptedException
+    public synchronized void deleteRecord(Record record)
     {
     	this.error = false;
     	this.record = null;
     	client.write(PacketFactory.deleteRecord(record));
-    	while(this.record == null || error) wait();
-    	if (error) throw new RuntimeException(err_message);
+    	while(this.record == null && !error) {
+    		try { wait(); } 
+    		catch(InterruptedException ex) { }
+    	}
+    	if (error) throw new AccessDeniedException(err_message);
     }
     
     public synchronized void setRecord(Record record)

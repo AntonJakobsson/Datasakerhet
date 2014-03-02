@@ -40,6 +40,7 @@ public class Daemon
             e.printStackTrace();
         }
         System.out.println(String.format("Listening on port %d... (SSL)", port));
+        Log.write(String.format("Server started on port %d", port));
         
         /* Kanske inte världens bästa idé men vafan */
         while(true)
