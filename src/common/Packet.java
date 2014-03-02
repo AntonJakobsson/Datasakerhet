@@ -13,6 +13,7 @@ public class Packet
     
     public final static int SUCCESS    = 0xF0;
     public final static int ERROR      = 0xF1;
+    public final static int DENIED     = 0xF2;
     
     private int type;
     private int code;
