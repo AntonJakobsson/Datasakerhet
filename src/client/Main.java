@@ -2,7 +2,11 @@ package client;
 
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import client.gui.LoginWindow;
+
+import common.Record;
 import common.User;
 
 public class Main
@@ -34,7 +38,45 @@ public class Main
 		while(loginWindow.showDialog() == 0)
 		{
 			String password = loginWindow.getPassword();
+			
+			User currentUser;
+			try { currentUser = state.auth(password); }
+			catch(AccessDeniedException ex) 
+			{
+				JOptionPane.showMessageDialog(null, ex.getMessage(), "Authentication failed", JOptionPane.ERROR_MESSAGE);
+				/* Hoppa tillbaks till login */
+				continue;
+			}
+			
+			System.out.println("Auth ok");
+			System.out.println("You are " + currentUser.toString());
+			
+			System.out.println("\nPatients:");
+			ArrayList<User> patients = state.queryUsers(User.PATIENT);
+			for(User p : patients)
+				System.out.println(p);
+			if (patients.size() == 0)
+				System.out.println("-- none --");
+			else
+			{
+				// DEBUG SHIT, find the maddafackin records
+				User patient = patients.get(0);
+				ArrayList<Record> records = state.queryRecords(patient);
+				
+				System.out.println("Records:");
+				for(Record r : records)
+					System.out.println(String.format("%d: %s", r.getId(), r.getData()));
+			}
+			
+			
+			System.out.println("");
+			
+			
 		}
+		
+		/* die */
+		client.close();
+		System.exit(0);
 	}
 	
     public static void main(String[] args)

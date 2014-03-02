@@ -106,11 +106,9 @@ public class Client implements Runnable
     {
         if (packet.getCode() == Packet.SUCCESS) {
             User user = gson.fromJson(packet.getString(), User.class);
-            System.out.println("Authenticated as " + user);
             state.setUser(user);
         }
         else {
-        	System.out.println("Authentication failed");
         	state.error(packet.getString());
         }
     }
