@@ -34,10 +34,10 @@ public class SelectUserWindow extends JPanel
         this.add(userLabel);
         table = new JTable(userList.size(), 1);
         JScrollPane scroll = new JScrollPane(table);
+        table.setEnabled(false);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fillTable(table, userList);
-        table.setRowSelectionAllowed(true);
         this.add(scroll);
         this.add(table);
         
@@ -59,7 +59,7 @@ public class SelectUserWindow extends JPanel
     
     protected void reset()
     {
-
+        table.removeAll();
     }
     
     public int showDialog() 
