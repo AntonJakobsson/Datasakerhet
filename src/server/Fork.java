@@ -123,14 +123,14 @@ public class Fork implements Runnable
     {
     	User u = db.users().findById(packet.getId());
     	String hash = Security.hash(packet.getPassword(), u.getSalt());
-    	String message = "";
-    	int code = -1;
+    	String message;
+    	int code;
     	if (hash.equals(u.getPassword())) {
     		message = "Authentication successful";
-    		code = 0; //Not defined
+    		code = AuthPacket.ACCEPT; //Not defined
     	} else {
     		message = "Invalid username or password";
-    		code = 1; //Not defined
+    		code = AuthPacket.DECLINE; //Not defined
     	}
     	Packet p = new Packet(Packet.AUTH, code, message);
     	output.write(p);
