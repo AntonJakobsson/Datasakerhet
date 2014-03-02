@@ -20,6 +20,7 @@ public class RecordReplicator
     private PreparedStatement findByUser;
     private PreparedStatement findAll;
     private PreparedStatement deleteRecord;
+    private PreparedStatement updateRecord;
     
     public RecordReplicator(Connection connection) throws SQLException
     {
@@ -44,16 +45,47 @@ public class RecordReplicator
         this.deleteRecord = connection.prepareStatement(
             "UPDATE `record` SET active=0 WHERE id=?"
         );
+        this.updateRecord = connection.prepareStatement(
+        	"UPDATE `records` SET " +
+        	"data=? "+
+        	"WHERE id=?"
+        );
     }
     
     public void insert(Record record) throws SQLException
     {
+    	if (record.getId() > 0) {
+    		/* Om recordet har ett id, uppdatera istället */
+    		update(record);
+    		return;
+    	}
+    	
         insertRecord.setInt(1,    record.getPatientId());
         insertRecord.setInt(2,    record.getNurseId());
         insertRecord.setInt(3,    record.getDoctorId());
         insertRecord.setString(4, record.getData());
         insertRecord.setString(5, record.getDivision());
         insertRecord.execute();
+        
+        ResultSet generatedKeys = insertRecord.getGeneratedKeys();
+        if (generatedKeys.next()) {
+            record.setId(generatedKeys.getInt(1));
+        } else {
+            throw new SQLException("Creating record failed, no ID obtained.");
+        }
+    }
+    
+    public void update(Record record) throws SQLException
+    {
+    	if (record.getId() == 0) {
+    		/* Om id saknas, gör insert istället */
+    		insert(record);
+    		return;
+    	}
+    	
+    	updateRecord.setString(1, record.getData());
+    	updateRecord.setInt(2,    record.getId());
+    	updateRecord.execute();
     }
     
     public void delete(Record record) throws SQLException

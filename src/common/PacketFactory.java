@@ -19,6 +19,11 @@ public class PacketFactory
         return new Packet(Packet.QUERY_USER, type, "");
     }
     
+    public static Packet queryRecords(User user)
+    {
+    	return new Packet(Packet.QUERY_REC, user.getId(), "");
+    }
+    
     /* Singleton GSON */
     private static Gson _gson;
     private static Gson gson() 
