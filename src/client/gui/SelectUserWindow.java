@@ -42,16 +42,16 @@ public class SelectUserWindow extends JPanel
     }
     protected void fillTable(JTable table, ArrayList<User> userlist){
         String name;
-        int index=1;
+        int index=0;
         for(User user: userlist){
             name = user.getName();
-            table.getModel().setValueAt(name,index,1);
+            table.getModel().setValueAt(name,index,0);
             index++;
         }
         index = 0;
     }
     
-    protected User getSelectedUser(){
+    public User getSelectedUser(){
         return userList.get(table.getSelectedRow());
     }
     
