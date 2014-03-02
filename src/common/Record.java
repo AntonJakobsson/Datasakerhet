@@ -80,4 +80,12 @@ public class Record
     {
         return data;
     }
+    
+    /* Null object */
+    public static class None extends Record
+    {
+    	public None() {
+    		super(0, 0, 0, "", "");
+    	}
+    }
 }

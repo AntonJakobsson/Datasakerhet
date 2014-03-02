@@ -19,10 +19,14 @@ import com.google.gson.reflect.TypeToken;
 import common.Packet;
 import common.PacketReader;
 import common.PacketWriter;
+import common.Record;
 import common.User;
 
 public class Client implements Runnable
 {
+	public final static String KEYSTORE   = "client_key.store";
+	public final static String TRUSTSTORE = "client_trust.store";
+	
     protected String host;
     protected int port;
     protected boolean ready;
@@ -60,7 +64,8 @@ public class Client implements Runnable
             while(socket.isConnected()) 
             {
                 Packet packet = input.read();
-                switch(packet.getType()) {
+                switch(packet.getType()) 
+                {
                     case Packet.MESSAGE:
                         handleMessage(packet.getString());
                         break;
@@ -70,6 +75,15 @@ public class Client implements Runnable
                     case Packet.QUERY_USER:
                         handleQueryUser(packet);
                         break;
+                    case Packet.QUERY_REC:
+                    	handleQueryRecord(packet);
+                    	break;
+                    case Packet.POST:
+                    	handlePostRecord(packet);
+                    	break;
+                    case Packet.DELETE:
+                    	handleDeleteRecord(packet);
+                    	break;
                 }
             }
         }
@@ -96,16 +110,54 @@ public class Client implements Runnable
             state.setUser(user);
         }
         else {
-            System.out.println("Authentication failed");
-            state.setUser(new User.None());
+        	System.out.println("Authentication failed");
+        	state.error(packet.getString());
         }
     }
     
     protected void handleQueryUser(Packet packet)
     {
+    	if (packet.getCode() == Packet.DENIED) {
+    		state.error(packet.getString());
+    		return;
+    	}
+    	
         Type listType = new TypeToken<ArrayList<User>>() { }.getType();
         ArrayList<User> list = gson.fromJson(packet.getString(), listType);
         state.setUserList(list);
+    }
+    
+    protected void handleQueryRecord(Packet packet)
+    {
+    	if (packet.getCode() == Packet.DENIED) {
+    		state.error(packet.getString());
+    		return;
+    	}
+    	
+    	Type listType = new TypeToken<ArrayList<Record>>() { }.getType();
+        ArrayList<Record> list = gson.fromJson(packet.getString(), listType);
+        state.setRecordList(list);
+    }
+    
+    public void handlePostRecord(Packet packet)
+    {
+    	if (packet.getCode() == Packet.DENIED) {
+    		state.error(packet.getString());
+    		return;
+    	}
+    	
+    	Record record = gson.fromJson(packet.getString(), Record.class);
+    	state.setRecord(record);
+    }
+    
+    public void handleDeleteRecord(Packet packet)
+    {
+    	if (packet.getCode() == Packet.DENIED) {
+    		state.error(packet.getString());
+    		return;
+    	}
+    	
+    	state.setRecord(new Record.None());
     }
     
     /* Socket functions */
@@ -157,8 +209,8 @@ public class Client implements Runnable
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
             TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
             SSLContext ctx = SSLContext.getInstance("TLS");
-            ks.load(new FileInputStream("client_key.store"), password);  // keystore password (storepass)
-            ts.load(new FileInputStream("client_trust.store"), password); // truststore password (storepass);
+            ks.load(new FileInputStream(KEYSTORE),   password); // keystore password (storepass)
+            ts.load(new FileInputStream(TRUSTSTORE), password); // truststore password (storepass);
             kmf.init(ks, password); // user password (keypass)
             tmf.init(ts); // keystore can be used as truststore here
             ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);

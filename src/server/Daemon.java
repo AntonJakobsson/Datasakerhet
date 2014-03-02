@@ -41,6 +41,7 @@ public class Daemon
         }
         System.out.println(String.format("Listening on port %d... (SSL)", port));
         
+        /* Kanske inte världens bästa idé men vafan */
         while(true)
         	fork();
     }
