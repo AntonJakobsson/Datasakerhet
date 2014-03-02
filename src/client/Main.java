@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import client.gui.LoginWindow;
+import client.gui.SelectUserWindow;
 
 import common.Record;
 import common.User;
@@ -48,30 +49,14 @@ public class Main
 				continue;
 			}
 			
-			System.out.println("Auth ok");
-			System.out.println("You are " + currentUser.toString());
-			
-			System.out.println("\nPatients:");
 			ArrayList<User> patients = state.queryUsers(User.PATIENT);
-			for(User p : patients)
-				System.out.println(p);
-			if (patients.size() == 0)
-				System.out.println("-- none --");
-			else
+			SelectUserWindow selectUser = new SelectUserWindow(currentUser, patients);
+			while(selectUser.showDialog() == 0) 
 			{
-				// DEBUG SHIT, find the maddafackin records
-				User patient = patients.get(0);
-				ArrayList<Record> records = state.queryRecords(patient);
+				User selectedPatient = selectUser.getSelectedUser();
 				
-				System.out.println("Records:");
-				for(Record r : records)
-					System.out.println(String.format("%d: %s", r.getId(), r.getData()));
-			}
-			
-			
-			System.out.println("");
-			
-			
+				System.out.println("You have selected " + selectedPatient);
+			}			
 		}
 		
 		/* die */
