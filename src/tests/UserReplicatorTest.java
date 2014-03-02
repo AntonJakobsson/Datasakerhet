@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
-import server.User;
+import common.User;
+
 import server.data.Database;
 import server.data.UserReplicator;
 

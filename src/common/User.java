@@ -1,6 +1,5 @@
-package server;
+package common;
 
-import common.Security;
 
 public class User
 {
@@ -13,8 +12,8 @@ public class User
     private int    type;
     private String name;
     private String division;
-    private String password;
-    private String salt;
+    private transient String password;
+    private transient String salt;
 
     /**
      * Konstruktor för att skapa en NY användare
@@ -86,7 +85,7 @@ public class User
     }
     
     public String toString() {
-        return String.format("User %d: %s (%s, %s) %s %s", id, name, User.typeString(type), division, password, salt);
+        return String.format("User %d: %s (%s, %s)", id, name, User.typeString(type), division);
     }
     
     public static String typeString(int type) {
@@ -96,6 +95,13 @@ public class User
             case User.DOCTOR:     return "Doctor";
             case User.GOVERNMENT: return "Government Agency";
             default:              return "Invalid";
+        }
+    }
+    
+    public static class None extends User
+    {
+        public None() {
+            super(0, 0, "Not logged in", "", "", "");
         }
     }
 }

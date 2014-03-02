@@ -11,6 +11,9 @@ public class Packet
     public final static int POST       = 0x20;
     public final static int DELETE     = 0x21;
     
+    public final static int SUCCESS    = 0xF0;
+    public final static int ERROR      = 0xF1;
+    
     private int type;
     private int code;
     private String data;

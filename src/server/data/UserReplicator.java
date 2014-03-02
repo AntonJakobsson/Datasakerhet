@@ -7,7 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import server.User;
+import common.User;
+
 
 public class UserReplicator
 {
