@@ -76,6 +76,10 @@ public class Record
         return division;
     }
     
+    public void setData(String newData)
+    {
+    	this.data = newData;
+    }
     public String getData()
     {
         return data;
