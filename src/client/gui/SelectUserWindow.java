@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.JTableHeader;
 
 import common.User;
@@ -31,16 +32,18 @@ public class SelectUserWindow extends JPanel
     {
         userLabel = new JLabel("Logged in as: " + currentUser.toString());
         this.add(userLabel);
-        table = new JTable(userList.size(),1);
+        table = new JTable(userList.size(), 1);
         JScrollPane scroll = new JScrollPane(table);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fillTable(table, userList);
         table.setRowSelectionAllowed(true);
         this.add(scroll);
         this.add(table);
         
     }
-    protected void fillTable(JTable table, ArrayList<User> userlist){
+    protected void fillTable(JTable table, ArrayList<User> userlist)
+    {
         String name;
         int index=0;
         for(User user: userlist){
@@ -48,7 +51,6 @@ public class SelectUserWindow extends JPanel
             table.getModel().setValueAt(name,index,0);
             index++;
         }
-        index = 0;
     }
     
     public User getSelectedUser(){
@@ -57,9 +59,8 @@ public class SelectUserWindow extends JPanel
     
     protected void reset()
     {
-        
+
     }
-    
     
     public int showDialog() 
     {
