@@ -46,7 +46,7 @@ public class RecordReplicator
             "UPDATE `record` SET active=0 WHERE id=?"
         );
         this.updateRecord = connection.prepareStatement(
-        	"UPDATE `records` SET " +
+        	"UPDATE `record` SET " +
         	"data=? " +
         	"WHERE id=?"
         );

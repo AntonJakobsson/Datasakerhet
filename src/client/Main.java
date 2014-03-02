@@ -2,12 +2,43 @@ package client;
 
 import java.util.ArrayList;
 
+import client.gui.LoginWindow;
 import common.User;
 
 public class Main
 {
+	Client client;
+	NetworkState state;
+	
+	public Main(String host, int port)
+	{
+		client = new Client(host, port);
+	}
+	
+	public void run()
+	{
+		Thread networkThread = new Thread(client);
+        networkThread.start();
+	    try {
+	        while(!client.isConnected())
+	            Thread.sleep(50);
+        }
+        catch(InterruptedException ex) {
+            ex.printStackTrace();
+        }
+		this.state = client.getState();
+		
+		/* Application loop */
+		
+		LoginWindow loginWindow = new LoginWindow();
+		while(loginWindow.showDialog() == 0)
+		{
+			String password = loginWindow.getPassword();
+		}
+	}
+	
     public static void main(String[] args)
-    {
+    {	
         String host = null;
         int    port = -1;
         
@@ -23,22 +54,7 @@ public class Main
             System.exit(-1);
         }
         
-        Client client = new Client(host, port);
-        Thread networkThread = new Thread(client);
-        networkThread.start();
-        
-        try {
-            while(!client.isConnected())
-                Thread.sleep(50);
-            
-            NetworkState state = client.getState();
-            
-            ArrayList<User> users = state.queryUsers(User.PATIENT);
-            for(User u : users)
-                System.out.println(u);
-        }
-        catch(InterruptedException ex) {
-            ex.printStackTrace();
-        }
+        /* Go go */
+        new Main(host, port).run();
     }
 }
