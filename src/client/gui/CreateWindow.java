@@ -84,7 +84,7 @@ public class CreateWindow extends JPanel
         @Override
         public void actionPerformed(ActionEvent arg0)
         {
-           SelectUserWindow selectWindow = new SelectUserWindow(currentUser,nurseList);
+           SelectUserWindow selectWindow = new SelectUserWindow(currentUser,nurseList, "Select Nurse");
            if(selectWindow.showDialog() == 0){
                selectedNurse = selectWindow.getSelectedUser();
            }
