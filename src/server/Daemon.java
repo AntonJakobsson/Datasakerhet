@@ -50,12 +50,19 @@ public class Daemon
         	fork();
     }
     
-    public void ban(InetAddress address, int minutes) 
+    /** Bans an IP address from connecting to the server for a given amount of time */
+    public void ban(InetAddress address, int minutes, String reason) 
     {
-        bans.ban(address, minutes);
+        bans.ban(address, minutes, reason);
     }
     
-    public void fork() throws IOException
+    /** Registers a login attempt */
+    public boolean attempt(InetAddress address)
+    {
+    	return bans.attempt(address);
+    }
+    
+    protected void fork() throws IOException
     {
         SSLSocket client = (SSLSocket)socket.accept();
         

@@ -13,6 +13,7 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.security.cert.X509Certificate;
+import javax.swing.JOptionPane;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -99,7 +100,7 @@ public class Client implements Runnable
     
     protected void handleMessage(String message)
     {
-        System.out.println("<< " + message);
+        JOptionPane.showMessageDialog(null, message);
     }
     
     protected void handleAuth(Packet packet)

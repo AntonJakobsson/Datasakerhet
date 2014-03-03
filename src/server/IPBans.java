@@ -14,13 +14,14 @@ public class IPBans
         this.attempts = new  HashMap<String, Integer>();
     }
     
-    public void ban(InetAddress address, int minutes)
+    public void ban(InetAddress address, int minutes, String reason)
     {
         long expires = System.currentTimeMillis() + (long)minutes * 60000L;
         this.bans.put(address.getHostAddress(), expires);
+        Log.write(String.format("%s was banned for %d minutes. Reason: %s", address.getHostAddress(), minutes, reason));
     }
     
-    public void attempt(InetAddress address)
+    public boolean attempt(InetAddress address)
     {
         Integer count = this.attempts.get(address.getHostAddress());
         int c = 0;
@@ -30,11 +31,12 @@ public class IPBans
         
         if (c >= 3) {
             this.attempts.put(address.getHostAddress(), new Integer(0));
-            ban(address, 5);
-            return;
+            ban(address, 10, "3 failed login attempts");
+            return false;
         }
         
         this.attempts.put(address.getHostAddress(), new Integer(c));
+        return true;
     }
     
     public boolean isBanned(InetAddress address)

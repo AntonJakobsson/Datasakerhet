@@ -55,8 +55,6 @@ public class Fork implements Runnable
             this.input  = new PacketReader(this.socket.getInputStream());
             this.output = new PacketWriter(this.socket.getOutputStream());
             
-            output.write(new Packet(Packet.MESSAGE, 0, "Welcome lol"));
-            
             int user_id = this.getUserIdFromCert(cert);
             this.user = db.users().findById(user_id);
             
@@ -106,9 +104,24 @@ public class Fork implements Runnable
 			e.printStackTrace();
 		}
         finally {
-            close();
+            this.close();
         }
     }
+    
+    public void message(String message)
+    {
+    	write(new Packet(Packet.MESSAGE, 0, message));
+    }
+    
+    public void ban(int minutes, String reason)
+    {
+    	message(String.format("You have been banned for %d minutes\nReason: %s", minutes, reason));
+    	server.ban(socket.getInetAddress(), minutes, reason);
+		this.close();
+    }
+    
+    
+    /* Packet handlers */
     
     private void handleQueryUsers(int type)
 	{
@@ -122,6 +135,7 @@ public class Fork implements Runnable
 		    		if (type != User.PATIENT) {
 		    			write(new Packet(Packet.QUERY_USER, Packet.DENIED, "Patients may not query any other user types"));
 		    			Log.write(String.format("%s attempted to query users of type %s", this.user, User.typeString(type)));
+		    			this.ban(5, "Illegal user query attempt");
 		    			return;
 		    		}
 		    		results.add(this.user);
@@ -180,11 +194,13 @@ public class Fork implements Runnable
 			if (this.user.getType() != User.DOCTOR) {
 				write(new Packet(Packet.POST, Packet.DENIED, "Only doctors may create new records"));
 				Log.write(String.format("%s attempted to create a record without permission", this.user));
+				this.ban(30, "Illegal create attempt");
 				return;
 			}
 			if (record.getDoctorId() != this.user.getId()) {
 				write(new Packet(Packet.POST, Packet.DENIED, "You may not create records on behalf of other doctors"));
 				Log.write(String.format("%s attempted to edit/create record owned by another user", this.user));
+				this.ban(30, "Impersonation attempt");
 				return;
 			}
 			
@@ -211,6 +227,7 @@ public class Fork implements Runnable
 			if (this.user.getType() != User.GOVERNMENT) {
 				write(new Packet(Packet.DELETE, Packet.DENIED, "Only government agencies may delete records"));
 				Log.write(String.format("%s attempted to delete record %d", this.user, record.getId()));
+				this.ban(60, "Illegal delete attempt");
 				return;
 			}
 			db.records().delete(record);
@@ -241,6 +258,8 @@ public class Fork implements Runnable
     		code = Packet.ERROR;
     		this.authenticated = false;
     		Log.write(String.format("Failed login attempt: %s from %s", this.user, socket.getInetAddress()));
+    		if (!server.attempt(socket.getInetAddress()))
+    			socket.close();
     		Thread.sleep(500);
     	}
     	Packet p = new Packet(Packet.AUTH, code, message);
