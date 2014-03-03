@@ -72,8 +72,8 @@ public class CreateWindow extends JPanel
         infoPanel.add(patientLabel);
         infoPanel.add(nurseLabel);
         infoPanel.add(selectNurse);
-        this.add(textPanel);
         this.add(infoPanel);
+        this.add(textPanel);
     }
 
     public Record getCreatedRecord()
