@@ -100,6 +100,11 @@ public class Fork implements Runnable
 			System.out.println("Caught SQL Exception in network loop :S");
 			e.printStackTrace();
 		}
+		catch (InterruptedException e)
+		{
+			System.out.println("Thread interrupted during failed authentication");
+			e.printStackTrace();
+		}
         finally {
             close();
         }
@@ -168,7 +173,7 @@ public class Fork implements Runnable
 		}
 	}
 
-	private void handleAuthPacket(String password) throws SQLException, IOException
+	private void handleAuthPacket(String password) throws SQLException, IOException, InterruptedException
     {
 
     	String hash = Security.hash(password, user.getSalt());
@@ -184,6 +189,7 @@ public class Fork implements Runnable
     		message = "Invalid username or password";
     		code = Packet.ERROR;
     		this.authenticated = false;
+    		Thread.sleep(500);
     	}
     	
     	Packet p = new Packet(Packet.AUTH, code, message);
