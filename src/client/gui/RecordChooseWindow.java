@@ -53,6 +53,7 @@ public class RecordChooseWindow extends JPanel
 		this.setLayout(new GridLayout(2, 1));
 		JScrollPane scrollpane = new JScrollPane(table);
 		scrollpane.setPreferredSize(new Dimension(10, 80));
+		scrollpane.setColumnHeaderView(new JLabel("HEj"));
 		this.add(new JLabel("Patient: " + user.getName()));
 		this.add(scrollpane);
 

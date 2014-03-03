@@ -1,5 +1,7 @@
 package client.gui;
 
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
@@ -20,26 +22,32 @@ public class SelectUserWindow extends JPanel
     private ArrayList<User> userList;
     private User currentUser;
     private JLabel userLabel;
+    private String title;
     
-    public SelectUserWindow(User currentUser, ArrayList<User> userList)
+    public SelectUserWindow(User currentUser, ArrayList<User> userList, String title)
     {
         this.currentUser = currentUser;
         this.userList = userList;
+        this.title = title;
         setup();
     }
     
     protected void setup()
     {
-        userLabel = new JLabel("Logged in as: " + currentUser.toString());
-        this.add(userLabel);
-        table = new JTable(userList.size(), 1);
+        userLabel = new JLabel("Logged in as: " + currentUser.getName());
+        Object[][] data = new Object[userList.size()][1];
+        for(int i =0; i<userList.size();i++){
+            data[i][0] = userList.get(i).getName();
+        }
+        table = new JTable(data, new String[] {"Name"});
         JScrollPane scroll = new JScrollPane(table);
+        scroll.setPreferredSize(new Dimension(100,90));
         table.setEnabled(true);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fillTable(table, userList);
+        this.setLayout(new GridLayout(2,1));
+        this.add(userLabel);
         this.add(scroll);
-        this.add(table);
         
     }
     protected void fillTable(JTable table, ArrayList<User> userlist)
@@ -55,7 +63,7 @@ public class SelectUserWindow extends JPanel
     
     public User getSelectedUser() throws RuntimeException{
         if(table.getSelectedRow() == -1){
-            throw new RuntimeException("No patients selected!");
+            throw new RuntimeException("No user selected!");
         }
         return userList.get(table.getSelectedRow());
     }
@@ -68,7 +76,7 @@ public class SelectUserWindow extends JPanel
     public int showDialog() 
     {
         reset();
-        return JOptionPane.showOptionDialog(null, this, "Select patient",
+        return JOptionPane.showOptionDialog(null, this, title,
                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
                new String[] { "Ok", "Logout" }, "Ok");
     }

@@ -72,7 +72,7 @@ public class Main
         /* Query patients from server */
         ArrayList<User> patients = state.queryUsers(User.PATIENT);
         
-        SelectUserWindow selectUser = new SelectUserWindow(currentUser, patients);
+        SelectUserWindow selectUser = new SelectUserWindow(currentUser, patients, "Select Patient");
         while (selectUser.showDialog() == 0)
         {
             User selectedPatient = null;
