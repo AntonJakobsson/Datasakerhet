@@ -32,6 +32,14 @@ public class Record
         this.data = data;
     }
     
+    public boolean equals(Object other) 
+    {
+    	if (other instanceof Record) {
+    		return ((Record)other).getId() == this.id;
+    	}
+    	return false;
+    }
+    
     public int getId()
     {
         return id;

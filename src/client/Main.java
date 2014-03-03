@@ -124,17 +124,15 @@ public class Main
 	                    Record newrecord = newRecord(currentUser, selectedPatient);
 	                    records.add(newrecord);
 	                    chooseRecord.updateWindow(records);
-	                    /* Lägg till nytt record i listan? */
 	                    break;
 	                }
 	                case RecordChooseWindow.MESSAGE_DELETE: {
-	                	if(JOptionPane.showOptionDialog(null, this, "Confirm delete",
+	                	if(JOptionPane.showOptionDialog(null, "Are you sure you wish to delete this record?", "Confirm delete",
 	                            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
 	                            new String[] { "Confirm delete", "Cancel" }, "Confirm delete") == 0) {
 	                		state.deleteRecord(record);
 	                		records.remove(record);
 	                		chooseRecord.updateWindow(records);
-	                		/* Ta bort record från listan? */
 	                    }
 	                    break;
 	                }
@@ -144,11 +142,6 @@ public class Main
             	JOptionPane.showMessageDialog(null, ex.getMessage(), "Access denied", JOptionPane.ERROR_MESSAGE);
             }
         }
-    }
-    
-    protected void viewRecord(Record record)
-    {
-        
     }
     
     protected void editRecord(Record record)
@@ -170,9 +163,7 @@ public class Main
             Record newRecord = createWindow.getCreatedRecord();
             
             /* Post record to server */
-            state.postRecord(newRecord);
-            
-            return newRecord;
+            return state.postRecord(newRecord);
         }
         return null;
     }
