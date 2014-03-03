@@ -190,6 +190,8 @@ public class Client implements Runnable
         catch(IOException ex) {
             /* silence */
         }
+        
+        // TODO kill application ?
     }
     
     public boolean isConnected()

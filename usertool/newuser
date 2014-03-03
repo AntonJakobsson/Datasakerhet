@@ -9,6 +9,7 @@ echo
 java -classpath ".:../src:../lib/sqlite-jdbc-3.7.15-M1.jar" usertool "$type" "$name" "$div" "$password"
 id=$?
 
+rm client_*
 echo "Creating client certificate..."
 keytool -keystore client_trust.store -alias client -import -file ca.crt -storepass password -dname "CN=$id" -noprompt
 keytool -keystore client_key.store -alias client -genkey -storepass password -keypass password -dname "CN=$id"

@@ -2,7 +2,6 @@ package client;
 
 import java.util.ArrayList;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import client.gui.CreateWindow;
@@ -37,7 +36,15 @@ public class Main
         this.state = client.getState();
 
         /* Application loop */
-
+        login();
+        
+        /* Die */
+        client.close();
+        System.exit(0);
+    }
+    
+    protected void login()
+    {
         LoginWindow loginWindow = new LoginWindow();
         while (loginWindow.showDialog() == 0)
         {
@@ -45,6 +52,7 @@ public class Main
 
             User currentUser;
             try {
+                /* Authenticate user */
                 currentUser = state.auth(password);
             }
             catch (AccessDeniedException ex)
@@ -55,59 +63,108 @@ public class Main
                 continue;
             }
 
-            ArrayList<User> patients = state.queryUsers(User.PATIENT);
-            SelectUserWindow selectUser = new SelectUserWindow(currentUser, patients);
-            while (selectUser.showDialog() == 0)
-            {
-                User selectedPatient = null;
+            selectPatient(currentUser);
+        }
+    }
+    
+    protected void selectPatient(User currentUser)
+    {
+        /* Query patients from server */
+        ArrayList<User> patients = state.queryUsers(User.PATIENT);
+        
+        SelectUserWindow selectUser = new SelectUserWindow(currentUser, patients);
+        while (selectUser.showDialog() == 0)
+        {
+            User selectedPatient = null;
+            try {
+                selectedPatient = selectUser.getSelectedUser();
+                System.out.println("You have selected " + selectedPatient);
+            }
+            catch (RuntimeException e) {
+                JOptionPane.showMessageDialog(
+                    null, 
+                    e.getMessage(), 
+                    "Patient retrieval failed",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                continue;
+            }
+            
+            manipulateRecords(currentUser, selectedPatient);
+        }
+    }
+    
+    protected void manipulateRecords(User currentUser, User selectedPatient)
+    {
+        /* Query records from server */
+        ArrayList<Record> records = state.queryRecords(selectedPatient);
+        
+        RecordChooseWindow chooseRecord = new RecordChooseWindow(selectedPatient, records);
+        int button = 0;
+        while ((button = chooseRecord.showDialog()) != RecordChooseWindow.MESSAGE_CANCEL) 
+        {
+            Record record = null;
+            if (button != RecordChooseWindow.MESSAGE_NEW) {
                 try {
-                    selectedPatient = selectUser.getSelectedUser();
-                    System.out.println("You have selected " + selectedPatient);
+                    record = chooseRecord.getSelectedRecord();
                 }
                 catch (RuntimeException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage(), "Patient retrieval failed",
+                    JOptionPane.showMessageDialog(null, e.getMessage(), "Record retrieval failed",
                             JOptionPane.ERROR_MESSAGE);
                     continue;
                 }
-                ArrayList<Record> records = state.queryRecords(selectedPatient);
-                RecordChooseWindow chooseRecord = new RecordChooseWindow(selectedPatient, records);
-
-                int button = 0;
-                while ((button = chooseRecord.showDialog()) != RecordChooseWindow.MESSAGE_CANCEL) {
-                    Record record = null;
-                    try {
-                        record = chooseRecord.getSelectedRecord();
-                    }
-                    catch (RuntimeException e) {
-                        JOptionPane.showMessageDialog(null, e.getMessage(), "Record retrieval failed",
-                                JOptionPane.ERROR_MESSAGE);
-                        continue;
-                    }
-                    switch (button) {
-                        case RecordChooseWindow.MESSAGE_VIEW:
-                            EditWindow editWindow = new EditWindow(record);
-                            if (editWindow.showDialog() == 0) {
-                                // record is saved;
-                            }
-                            break;
-                        case RecordChooseWindow.MESSAGE_NEW:
-                          //CreateWindow createWindow = new CreateWindow(currentUser, selectedPatient, nurseList);
-                          //if(createWindow.showDialog()==0){
-                                //Record newRecord = createWindow.getCreatedRecord();
-                                //check record for special cases
-                                //update database
-                          //}
-                            break;
-                        case RecordChooseWindow.MESSAGE_DELETE:
-                            state.deleteRecord(record);
-                            ;
-                    }
+            }
+            
+            switch (button) 
+            {
+                case RecordChooseWindow.MESSAGE_VIEW: {
+                    editRecord(record);
+                    break;
+                }
+                case RecordChooseWindow.MESSAGE_NEW: {
+                    Record newrecord = newRecord(currentUser, selectedPatient);
+                    /* Lägg till nytt record i listan? */
+                    break;
+                }
+                case RecordChooseWindow.MESSAGE_DELETE: {
+                    /* Confirmation dialog */
+                    state.deleteRecord(record);
+                    /* Ta bort record från listan? */
+                    break;
                 }
             }
         }
-        /* die */
-        client.close();
-        System.exit(0);
+    }
+    
+    protected void viewRecord(Record record)
+    {
+        
+    }
+    
+    protected void editRecord(Record record)
+    {
+        EditWindow editWindow = new EditWindow(record);
+        if (editWindow.showDialog() == 0) {
+            /* Post record to server */
+            state.postRecord(record);
+        }
+    }
+    
+    protected Record newRecord(User currentUser, User selectedPatient)
+    {
+        /* Query nurses from server */
+        ArrayList<User> nurseList = state.queryUsers(User.NURSE);
+        
+        CreateWindow createWindow = new CreateWindow(currentUser, selectedPatient, nurseList);
+        if(createWindow.showDialog() == 0) {
+            Record newRecord = createWindow.getCreatedRecord();
+            
+            /* Post record to server */
+            state.postRecord(newRecord);
+            
+            return newRecord;
+        }
+        return null;
     }
 
     public static void main(String[] args)

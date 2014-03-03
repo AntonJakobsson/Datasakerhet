@@ -36,8 +36,6 @@ public class CreateWindow extends JPanel
 
     protected void setup()
     {
-
-        
         JLabel divisionLabel = new JLabel("Division:");
         division = new JTextField();
         division.setEditable(true);

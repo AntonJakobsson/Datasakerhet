@@ -62,14 +62,13 @@ public class Fork implements Runnable
             
             System.out.println("Certificate holder: " + user.toString());
             
-            int authTry = 0;
             while(socket.isConnected()) 
             {
             	Packet packet = input.read();
                 switch(packet.getType()) 
                 {
                     case Packet.AUTH: {
-                    	authTry = handleAuthPacket(packet.getString(), authTry);
+                    	handleAuthPacket(packet.getString());
                         break;
                     }
                     case Packet.DELETE: {
@@ -174,8 +173,10 @@ public class Fork implements Runnable
 		}
 	}
 
-	private int handleAuthPacket(String password, int authTry) throws SQLException, IOException, InterruptedException
+	private void handleAuthPacket(String password) throws SQLException, IOException, InterruptedException
     {
+	    /* Skip packet if authed */
+	    if (this.authenticated) return;
 
     	String hash = Security.hash(password, user.getSalt());
     	String message;
@@ -185,23 +186,15 @@ public class Fork implements Runnable
     		message = gson.toJson(user);
     		code = Packet.SUCCESS;
     		this.authenticated = true;
-    		authTry = 0;
     	} 
     	else {
     		message = "Invalid username or password";
     		code = Packet.ERROR;
     		this.authenticated = false;
-    		authTry++;
     		Thread.sleep(500);
-    	}
-    	if (authTry >=3) {
-    		server.ban(socket.getInetAddress(), 5);
-    		socket.close();
-    		return 0;
     	}
     	Packet p = new Packet(Packet.AUTH, code, message);
     	output.write(p);
-    	return authTry;
     }
     
     public void close()

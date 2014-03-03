@@ -27,6 +27,7 @@ public class Daemon
     public Daemon() 
     {
         this.db = new Database(Database.FILE);
+        this.bans = new IPBans();
         this.db.connect();
     }
     
@@ -59,6 +60,7 @@ public class Daemon
         SSLSocket client = (SSLSocket)socket.accept();
         
         if (bans.isBanned(client.getInetAddress())) {
+            System.out.println(String.format("%s was dropped: IP is banned", client.getInetAddress().getHostAddress()));
             client.close();
             return;
         }
