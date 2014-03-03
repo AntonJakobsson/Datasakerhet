@@ -64,11 +64,11 @@ public class Fork implements Runnable
             
             while(socket.isConnected()) 
             {
-                Packet packet = input.read();
+            	Packet packet = input.read();
                 switch(packet.getType()) 
                 {
                     case Packet.AUTH: {
-                        handleAuthPacket(packet.getString());
+                    	handleAuthPacket(packet.getString());
                         break;
                     }
                     case Packet.DELETE: {
@@ -98,6 +98,11 @@ public class Fork implements Runnable
 		catch (SQLException e)
 		{
 			System.out.println("Caught SQL Exception in network loop :S");
+			e.printStackTrace();
+		}
+		catch (InterruptedException e)
+		{
+			System.out.println("Thread interrupted during failed authentication");
 			e.printStackTrace();
 		}
         finally {
@@ -189,6 +194,9 @@ public class Fork implements Runnable
 			else {
 				db.records().insert(record);
 			}
+			
+			/* men svara för fan */
+			write(new Packet(Packet.POST, 0, gson.toJson(record)));
 		}
 		catch(SQLException ex) {
 			System.out.println("addPost SQL exception:");
@@ -213,8 +221,10 @@ public class Fork implements Runnable
 		}
 	}
 
-	private void handleAuthPacket(String password) throws SQLException, IOException
+	private void handleAuthPacket(String password) throws SQLException, IOException, InterruptedException
     {
+	    /* Skip packet if authed */
+	    if (this.authenticated) return;
 
     	String hash = Security.hash(password, user.getSalt());
     	String message;
@@ -231,8 +241,8 @@ public class Fork implements Runnable
     		code = Packet.ERROR;
     		this.authenticated = false;
     		Log.write(String.format("Failed login attempt: %s from %s", this.user, socket.getInetAddress()));
+    		Thread.sleep(500);
     	}
-    	
     	Packet p = new Packet(Packet.AUTH, code, message);
     	output.write(p);
     }

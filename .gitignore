@@ -9,3 +9,6 @@
 
 /lib/*-javadoc.jar
 /lib/*-sources.jar
+
+log.txt
+usertool/*.tar.gz

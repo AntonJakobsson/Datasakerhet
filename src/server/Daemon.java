@@ -2,6 +2,7 @@ package server;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.security.KeyStore;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -21,10 +22,12 @@ public class Daemon
     protected int port;
     protected SSLServerSocket socket;
     protected Database db;
+    protected IPBans bans;
     
     public Daemon() 
     {
         this.db = new Database(Database.FILE);
+        this.bans = new IPBans();
         this.db.connect();
     }
     
@@ -47,9 +50,21 @@ public class Daemon
         	fork();
     }
     
+    public void ban(InetAddress address, int minutes) 
+    {
+        bans.ban(address, minutes);
+    }
+    
     public void fork() throws IOException
     {
         SSLSocket client = (SSLSocket)socket.accept();
+        
+        if (bans.isBanned(client.getInetAddress())) {
+            System.out.println(String.format("%s was dropped: IP is banned", client.getInetAddress().getHostAddress()));
+            client.close();
+            return;
+        }
+        
         Fork fork = new Fork(this, client);
         new Thread(fork).start();
     }
