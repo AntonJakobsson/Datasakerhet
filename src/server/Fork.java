@@ -154,6 +154,9 @@ public class Fork implements Runnable
 			else {
 				db.records().insert(record);
 			}
+			
+			/* men svara för fan */
+			write(new Packet(Packet.POST, 0, gson.toJson(record)));
 		}
 		catch(SQLException ex) {
 			System.out.println("addPost SQL exception:");
