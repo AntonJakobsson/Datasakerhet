@@ -55,6 +55,7 @@ public class RecordChooseWindow extends JPanel
 	 * Ritar om table naer nya records tillkommit
 	 * @param newRecords updated recordslist
 	 */
+
 	public void updateWindow(ArrayList<Record> newRecords)
 	{
 		Object[][] data = fillMatrix(newRecords);
@@ -76,7 +77,7 @@ public class RecordChooseWindow extends JPanel
 		}
 		return data;
 	}
-	
+
 	public Record getSelectedRecord()
 	{
 	    if(table.getSelectedRow() == -1){
