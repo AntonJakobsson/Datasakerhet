@@ -77,21 +77,22 @@ public class CreateWindow extends JPanel
         
         private static final long serialVersionUID = -7980331329742864631L;
         
-        public selectNurseButton(){
+        public selectNurseButton()
+        {
             super("Select nurse");
+            this.addActionListener(this);
         }
 
         @Override
         public void actionPerformed(ActionEvent arg0)
         {
            SelectUserWindow selectWindow = new SelectUserWindow(currentUser,nurseList);
-           if(selectWindow.showDialog() == 0){
+           if(selectWindow.showDialog() == 0) {
                selectedNurse = selectWindow.getSelectedUser();
            }
            else{
                //no nurse selected, cancel was pressed
            }
         }
-        
     }
 }
