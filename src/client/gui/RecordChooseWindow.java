@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
 
 import common.Record;
 import common.User;
@@ -47,7 +48,6 @@ public class RecordChooseWindow extends JPanel
 		scrollpane.setColumnHeaderView(new JLabel("HEj"));
 		this.add(new JLabel("Patient: " + user.getName()));
 		this.add(scrollpane);
-
 	}
 
 	/**
@@ -55,8 +55,9 @@ public class RecordChooseWindow extends JPanel
 	 * @param newRecords updated recordslist
 	 */
 	public void updateWindow(ArrayList<Record> newRecords){
-	   table = fillMatrix(newRecords);
-	   setup();
+		reset();
+		table = fillMatrix(newRecords);
+		setup();
 	}
 	
 	private JTable fillMatrix(ArrayList<Record> newRecords)
@@ -71,6 +72,11 @@ public class RecordChooseWindow extends JPanel
 			data[i][3] = record.getDivision();
 		}
 		return new JTable(data, columnames);
+	}
+
+	private void reset(){
+	    DefaultTableModel model = (DefaultTableModel) table.getModel();
+	    model.setRowCount(0);
 	}
 	
 	public Record getSelectedRecord()

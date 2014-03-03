@@ -135,7 +135,6 @@ public class Fork implements Runnable
 		    		if (type != User.PATIENT) {
 		    			write(new Packet(Packet.QUERY_USER, Packet.DENIED, "Patients may not query any other user types"));
 		    			Log.write(String.format("%s attempted to query users of type %s", this.user, User.typeString(type)));
-		    			this.ban(5, "Illegal user query attempt");
 		    			return;
 		    		}
 		    		results.add(this.user);
@@ -190,17 +189,16 @@ public class Fork implements Runnable
 	{
 		ensureAuth();
 		try {
-			// TODO maddafackin security
 			if (this.user.getType() != User.DOCTOR) {
-				write(new Packet(Packet.POST, Packet.DENIED, "Only doctors may create new records"));
+				/* Endast doctor har rätt att ändra i records */
+				write(new Packet(Packet.POST, Packet.DENIED, "Only doctors may create/edit new records"));
 				Log.write(String.format("%s attempted to create a record without permission", this.user));
-				this.ban(30, "Illegal create attempt");
 				return;
 			}
 			if (record.getDoctorId() != this.user.getId()) {
-				write(new Packet(Packet.POST, Packet.DENIED, "You may not create records on behalf of other doctors"));
+				/* Doctor kan endast ändra sina egna records */
+				write(new Packet(Packet.POST, Packet.DENIED, "You may not create/edit records on behalf of other doctors"));
 				Log.write(String.format("%s attempted to edit/create record owned by another user", this.user));
-				this.ban(30, "Impersonation attempt");
 				return;
 			}
 			
@@ -227,7 +225,6 @@ public class Fork implements Runnable
 			if (this.user.getType() != User.GOVERNMENT) {
 				write(new Packet(Packet.DELETE, Packet.DENIED, "Only government agencies may delete records"));
 				Log.write(String.format("%s attempted to delete record %d", this.user, record.getId()));
-				this.ban(60, "Illegal delete attempt");
 				return;
 			}
 			db.records().delete(record);
