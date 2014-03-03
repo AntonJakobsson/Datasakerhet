@@ -65,7 +65,6 @@ public class RecordChooseWindow extends JPanel
 	 */
 	public void updateWindow(ArrayList<Record> newRecords){
 	    
-	    
 	}
 	
 	public void reset(){
