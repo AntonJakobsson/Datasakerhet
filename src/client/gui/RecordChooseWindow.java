@@ -24,6 +24,10 @@ public class RecordChooseWindow extends JPanel
 	protected JTable			table;
 	protected ArrayList<Record>	records;
 	protected User				user;
+	public static final int MESSAGE_VIEW = 3;
+	public static final int MESSAGE_DELETE = 2;
+	public static final int MESSAGE_NEW = 1;
+	public static final int MESSAGE_CANCEL = 0;
 
 	public RecordChooseWindow(User user, ArrayList<Record> records)
 	{
@@ -56,12 +60,15 @@ public class RecordChooseWindow extends JPanel
 
 	public Record getSelectedRecord()
 	{
+	    if(table.getSelectedRow() == -1){
+	        throw new RuntimeException("No record selected!");
+	    }
 		return records.get(table.getSelectedRow());
 	}
 
 	public int showDialog()
 	{
 		return JOptionPane.showOptionDialog(null, this, "Records", JOptionPane.DEFAULT_OPTION,
-				JOptionPane.PLAIN_MESSAGE, null, new String[] { "New", "Delete", "View" }, "Ok");
+				JOptionPane.PLAIN_MESSAGE, null, new String[] {"Cancel", "New", "Delete", "View" }, "Ok");
 	}
 }

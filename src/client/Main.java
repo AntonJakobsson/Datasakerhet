@@ -2,11 +2,12 @@ package client;
 
 import java.util.ArrayList;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import client.gui.LoginWindow;
+import client.gui.RecordChooseWindow;
 import client.gui.SelectUserWindow;
-
 import common.Record;
 import common.User;
 
@@ -53,12 +54,40 @@ public class Main
 			SelectUserWindow selectUser = new SelectUserWindow(currentUser, patients);
 			while(selectUser.showDialog() == 0) 
 			{
-				User selectedPatient = selectUser.getSelectedUser();
+			    User selectedPatient = null;
+				try{
+				    selectedPatient = selectUser.getSelectedUser();
+				    System.out.println("You have selected " + selectedPatient);
+				}
+				catch (RuntimeException e){
+				    JOptionPane.showMessageDialog(null, e.getMessage(), "Patient retrieval failed", JOptionPane.ERROR_MESSAGE);
+				    continue;
+				}
+				ArrayList<Record> records = state.queryRecords(selectedPatient);
+				RecordChooseWindow chooseRecord = new RecordChooseWindow(selectedPatient, records);
 				
-				System.out.println("You have selected " + selectedPatient);
-			}			
+				int button = 0;
+				while((button = chooseRecord.showDialog()) != RecordChooseWindow.MESSAGE_CANCEL){
+				    Record record = null;
+				    try{
+				       record = chooseRecord.getSelectedRecord();
+				    }
+				    catch (RuntimeException e){
+				        JOptionPane.showMessageDialog(null, e.getMessage(), "Record retrieval failed", JOptionPane.ERROR_MESSAGE);
+	                    continue;
+				    }
+				    switch (button){
+				    case RecordChooseWindow.MESSAGE_VIEW:
+				        ;
+				    case RecordChooseWindow.MESSAGE_NEW:
+				        ;
+				    case RecordChooseWindow.MESSAGE_DELETE:
+				        state.deleteRecord(record);
+				        ;
+				    }
+				}
+			}
 		}
-		
 		/* die */
 		client.close();
 		System.exit(0);

@@ -34,7 +34,7 @@ public class SelectUserWindow extends JPanel
         this.add(userLabel);
         table = new JTable(userList.size(), 1);
         JScrollPane scroll = new JScrollPane(table);
-        table.setEnabled(false);
+        table.setEnabled(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fillTable(table, userList);
@@ -53,7 +53,10 @@ public class SelectUserWindow extends JPanel
         }
     }
     
-    public User getSelectedUser(){
+    public User getSelectedUser() throws RuntimeException{
+        if(table.getSelectedRow() == -1){
+            throw new RuntimeException("No patients selected!");
+        }
         return userList.get(table.getSelectedRow());
     }
     
