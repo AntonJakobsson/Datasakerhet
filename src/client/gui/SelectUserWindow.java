@@ -39,11 +39,15 @@ public class SelectUserWindow extends JPanel
         for(int i =0; i<userList.size();i++){
             data[i][0] = userList.get(i).getName();
         }
-        table = new JTable(data, new String[] {"Name"});
+        table = new JTable(data, new String[] {"Name"}){
+            public boolean isCellEditable(int row, int column) {                
+                return false;               
+        };
+        };
         JScrollPane scroll = new JScrollPane(table);
         scroll.setPreferredSize(new Dimension(100,90));
-        table.setEnabled(true);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
         fillTable(table, userList);
         this.setLayout(new GridLayout(2,1));
         this.add(userLabel);
