@@ -23,18 +23,18 @@ import common.User;
 
 public class Fork implements Runnable
 {
-    Daemon server;
-    SSLSocket socket;
-    SSLSession session;
-    X509Certificate cert;
+    protected Daemon server;
+    protected SSLSocket socket;
+    protected SSLSession session;
+    protected X509Certificate cert;
     
-    PacketReader input;
-    PacketWriter output;
-    Database db;
-    Gson gson;
+    protected PacketReader input;
+    protected PacketWriter output;
+    protected Database db;
+    protected Gson gson;
     
-    User user;
-    boolean authenticated;
+    protected User user;
+    protected boolean authenticated;
     
     public Fork(Daemon daemon, SSLSocket socket) throws SSLPeerUnverifiedException
     {
@@ -113,11 +113,27 @@ public class Fork implements Runnable
     private void handleQueryUsers(int type)
 	{
 		ensureAuth();
-		ArrayList<User> results;
-	    try {
-	        // TODO Security levelz
-            results = db.users().findByType(type);
-        }
+		ArrayList<User> results = new ArrayList<User>();;
+	    try 
+	    {
+	    	switch(this.user.getType())
+	    	{
+		    	case User.PATIENT:
+		    		if (type != User.PATIENT) {
+		    			write(new Packet(Packet.QUERY_USER, Packet.DENIED, "Patients may not query any other user types"));
+		    			Log.write(String.format("%s attempted to query users of type %s", this.user, User.typeString(type)));
+		    			return;
+		    		}
+		    		results.add(this.user);
+		    		break;
+		    	
+		    	case User.NURSE:
+		    	case User.DOCTOR:
+		    	case User.GOVERNMENT:
+		    		results = db.users().findByType(type);
+		    		break;
+	    	}
+	    }
         catch (SQLException e) {
         	System.out.println("handleQueryUsers SQL Exception:");
         	e.printStackTrace();
@@ -129,11 +145,24 @@ public class Fork implements Runnable
 	private void handleQueryRecord(Packet p)
 	{
 		ensureAuth();
-		ArrayList<Record> results;
+		ArrayList<Record> results = new ArrayList<Record>();
 		try {
-	        // TODO Security levelz
 			User user = db.users().findById(p.getCode());
-            results = db.records().findByUser(user);
+			switch(this.user.getType()) 
+			{
+				case User.PATIENT:
+	            	results = db.records().findByPatient(this.user);
+	            	break;
+				case User.NURSE:
+					results = db.records().findByNurse(user, this.user);
+					break;
+				case User.DOCTOR:
+					results = db.records().findByDoctor(user, this.user);
+					break;
+				case User.GOVERNMENT:
+					results = db.records().findByPatient(user);
+					break;
+			}
         }
         catch (SQLException e) {
         	System.out.println("handleQueryRecord SQL Exception:");
@@ -148,12 +177,26 @@ public class Fork implements Runnable
 		ensureAuth();
 		try {
 			// TODO maddafackin security
+			if (this.user.getType() != User.DOCTOR) {
+				write(new Packet(Packet.POST, Packet.DENIED, "Only doctors may create new records"));
+				Log.write(String.format("%s attempted to create a record without permission", this.user));
+				return;
+			}
+			if (record.getDoctorId() != this.user.getId()) {
+				write(new Packet(Packet.POST, Packet.DENIED, "You may not create records on behalf of other doctors"));
+				Log.write(String.format("%s attempted to edit/create record owned by another user", this.user));
+				return;
+			}
+			
 			if (db.records().exists(record.getId())) {
 				db.records().update(record);
 			}
 			else {
 				db.records().insert(record);
 			}
+			
+			/* men svara för fan */
+			write(new Packet(Packet.POST, 0, gson.toJson(record)));
 		}
 		catch(SQLException ex) {
 			System.out.println("addPost SQL exception:");
@@ -165,6 +208,11 @@ public class Fork implements Runnable
 	{
 		ensureAuth();
 		try {
+			if (this.user.getType() != User.GOVERNMENT) {
+				write(new Packet(Packet.DELETE, Packet.DENIED, "Only government agencies may delete records"));
+				Log.write(String.format("%s attempted to delete record %d", this.user, record.getId()));
+				return;
+			}
 			db.records().delete(record);
 		}
 		catch(SQLException ex) {
@@ -186,11 +234,13 @@ public class Fork implements Runnable
     		message = gson.toJson(user);
     		code = Packet.SUCCESS;
     		this.authenticated = true;
+    		Log.write(String.format("%s authenticated from %s", this.user, socket.getInetAddress()));
     	} 
     	else {
     		message = "Invalid username or password";
     		code = Packet.ERROR;
     		this.authenticated = false;
+    		Log.write(String.format("Failed login attempt: %s from %s", this.user, socket.getInetAddress()));
     		Thread.sleep(500);
     	}
     	Packet p = new Packet(Packet.AUTH, code, message);

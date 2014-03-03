@@ -17,8 +17,10 @@ public class RecordReplicator
     private PreparedStatement createTable;
     private PreparedStatement insertRecord;
     private PreparedStatement findById;
-    private PreparedStatement findByUser;
+    private PreparedStatement findByPatient;
     private PreparedStatement findAll;
+    private PreparedStatement findByNurse;
+    private PreparedStatement findByDoctor;
     private PreparedStatement deleteRecord;
     private PreparedStatement updateRecord;
     
@@ -40,7 +42,7 @@ public class RecordReplicator
             Statement.RETURN_GENERATED_KEYS
         );
         this.findById     = connection.prepareStatement(whereQuery("r.id=?"));
-        this.findByUser   = connection.prepareStatement(whereQuery("(r.patient=? OR r.nurse=? OR r.doctor=?)"));
+        this.findByPatient = connection.prepareStatement(whereQuery("r.patient=?"));
         this.findAll      = connection.prepareStatement(whereQuery("1=1"));
         this.deleteRecord = connection.prepareStatement(
             "UPDATE `record` SET active=0 WHERE id=?"
@@ -50,6 +52,9 @@ public class RecordReplicator
         	"data=? " +
         	"WHERE id=?"
         );
+        
+        this.findByNurse = connection.prepareStatement(whereQuery("r.patient=? AND (r.nurse=? OR r.division=?)"));
+        this.findByDoctor = connection.prepareStatement(whereQuery("r.patient=? AND (r.doctor=? OR r.division=?)"));
     }
     
     public void insert(Record record) throws SQLException
@@ -114,12 +119,28 @@ public class RecordReplicator
         return records.get(0);
     }
     
-    public ArrayList<Record> findByUser(User user) throws SQLException
+    public ArrayList<Record> findByPatient(User user) throws SQLException
     {
-        findByUser.setInt(1, user.getId());
-        findByUser.setInt(2, user.getId());
-        findByUser.setInt(3, user.getId());
-        ResultSet results = findByUser.executeQuery();
+        findByPatient.setInt(1, user.getId());
+        ResultSet results = findByPatient.executeQuery();
+        return getRecords(results);
+    }
+    
+    public ArrayList<Record> findByNurse(User user, User nurse) throws SQLException
+    {
+        findByNurse.setInt(1, user.getId());
+        findByNurse.setInt(2, nurse.getId());
+        findByNurse.setString(3, nurse.getDivision());
+        ResultSet results = findByNurse.executeQuery();
+        return getRecords(results);
+    }
+    
+    public ArrayList<Record> findByDoctor(User user, User doctor) throws SQLException
+    {
+        findByDoctor.setInt(1, user.getId());
+        findByDoctor.setInt(2, doctor.getId());
+        findByDoctor.setString(3, doctor.getDivision());
+        ResultSet results = findByDoctor.executeQuery();
         return getRecords(results);
     }
     
@@ -156,8 +177,8 @@ public class RecordReplicator
                 results.getString("patient_name"),
                 results.getString("nurse_name"),
                 results.getString("doctor_name"),
-                results.getString("data"),
-                results.getString("division")
+                results.getString("division"),
+                results.getString("data")
             );
             records.add(record);
         }
