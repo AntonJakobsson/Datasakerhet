@@ -1,2 +1,2 @@
 #!/bin/bash
-rm -f ca.* *.csr *.crt *.store
+rm -f ca.* *.csr *.crt *.store client.tar.gz

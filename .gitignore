@@ -5,6 +5,7 @@
 *.crt
 *.csr
 *.key
+*.store
 
 /lib/*-javadoc.jar
 /lib/*-sources.jar
