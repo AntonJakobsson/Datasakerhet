@@ -1,5 +1,6 @@
 package client.gui;
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,7 +56,8 @@ public class CreateWindow extends JPanel
         recordInformation = new JTextArea();
         recordInformation.setEditable(true);
         JScrollPane scroll = new JScrollPane(recordInformation);
-
+        recordInformation.setPreferredSize(new Dimension(100,60));
+        
         textPanel.add(scroll);
         textPanel.add(recordLabel);
         textPanel.add(recordInformation);
