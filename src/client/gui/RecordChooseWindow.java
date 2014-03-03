@@ -11,7 +11,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import common.Record;
 import common.User;
