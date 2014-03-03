@@ -126,9 +126,12 @@ public class Main
 	                    break;
 	                }
 	                case RecordChooseWindow.MESSAGE_DELETE: {
-	                    /* Confirmation dialog */
-	                    state.deleteRecord(record);
-	                    /* Ta bort record från listan? */
+	                	if(JOptionPane.showOptionDialog(null, this, "Confirm delete",
+	                            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
+	                            new String[] { "Confirm delete", "Cancel" }, "Confirm delete") == 0) {
+	                		state.deleteRecord(record);
+	                		/* Ta bort record från listan? */
+	                    }
 	                    break;
 	                }
 	            }
