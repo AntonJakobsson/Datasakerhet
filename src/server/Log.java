@@ -32,6 +32,7 @@ public class Log
         try
         {
             writer.write(sb.toString() + "\n");
+            System.out.println("L << " + sb.toString());
         }
         catch (IOException ioe)
         {
