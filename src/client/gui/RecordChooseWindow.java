@@ -29,27 +29,18 @@ public class RecordChooseWindow extends JPanel
 	public static final int MESSAGE_DELETE = 2;
 	public static final int MESSAGE_NEW = 1;
 	public static final int MESSAGE_CANCEL = 0;
+	private final String[] columnames = { "Record ID", "Doctor", "Nurse", "Division" };
 
 	public RecordChooseWindow(User user, ArrayList<Record> records)
 	{
 		this.records = records;
 		this.user = user;
+		table = fillMatrix(this.records);
 		setup();
 	}
 
 	private void setup()
 	{
-		String[] columnames = { "Record ID", "Doctor", "Nurse", "Division" };
-		Object[][] data = new Object[records.size()][4];
-		for (int i = 0; i < records.size(); i++)
-		{
-			Record record = records.get(i);
-			data[i][0] = record.getId();
-			data[i][1] = record.getDoctorName();
-			data[i][2] = record.getNurseName();
-			data[i][3] = record.getDivision();
-		}
-		table = new JTable(data, columnames);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.setLayout(new GridLayout(2, 1));
 		JScrollPane scrollpane = new JScrollPane(table);
@@ -64,10 +55,26 @@ public class RecordChooseWindow extends JPanel
 	 * @param newRecords updated recordslist
 	 */
 	public void updateWindow(ArrayList<Record> newRecords){
-	    
+		reset();
+		table = fillMatrix(newRecords);
+		setup();
 	}
 	
-	public void reset(){
+	private JTable fillMatrix(ArrayList<Record> newRecords)
+	{
+		Object[][] data = new Object[newRecords.size()][4];
+		for (int i = 0; i < newRecords.size(); i++)
+		{
+			Record record = newRecords.get(i);
+			data[i][0] = record.getId();
+			data[i][1] = record.getDoctorName();
+			data[i][2] = record.getNurseName();
+			data[i][3] = record.getDivision();
+		}
+		return new JTable(data, columnames);
+	}
+
+	private void reset(){
 	    DefaultTableModel model = (DefaultTableModel) table.getModel();
 	    model.setRowCount(0);
 	}

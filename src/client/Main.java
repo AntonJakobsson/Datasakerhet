@@ -122,6 +122,8 @@ public class Main
 	                }
 	                case RecordChooseWindow.MESSAGE_NEW: {
 	                    Record newrecord = newRecord(currentUser, selectedPatient);
+	                    records.add(newrecord);
+	                    chooseRecord.updateWindow(records);
 	                    /* Lägg till nytt record i listan? */
 	                    break;
 	                }
@@ -130,6 +132,8 @@ public class Main
 	                            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
 	                            new String[] { "Confirm delete", "Cancel" }, "Confirm delete") == 0) {
 	                		state.deleteRecord(record);
+	                		records.remove(record);
+	                		chooseRecord.updateWindow(records);
 	                		/* Ta bort record från listan? */
 	                    }
 	                    break;
