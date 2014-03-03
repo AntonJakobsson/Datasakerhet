@@ -195,6 +195,7 @@ public class Fork implements Runnable
     		Thread.sleep(500);
     	}
     	if (authTry >=3) {
+    		server.ban(socket.getInetAddress(), 5);
     		socket.close();
     		return 0;
     	}
