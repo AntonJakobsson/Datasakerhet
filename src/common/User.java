@@ -1,5 +1,6 @@
 package common;
 
+/** Represents a user (patient, nurse, doctor or government agency) */
 public class User
 {
     public final static int PATIENT    = 1;

@@ -192,7 +192,8 @@ public class Client implements Runnable
             /* silence */
         }
         
-        // TODO kill application ?
+        System.out.println("Socket disconnected. Killing application");
+        System.exit(-1);
     }
     
     public boolean isConnected()

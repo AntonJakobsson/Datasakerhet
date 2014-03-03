@@ -1,5 +1,6 @@
 package common;
 
+/** Represents a journal record */
 public class Record
 {
     private int    id;

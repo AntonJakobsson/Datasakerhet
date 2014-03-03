@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-
+/** Helper class for writing packets to a byte stream */
 public class PacketWriter
 {
     BufferedOutputStream stream;
