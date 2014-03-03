@@ -56,7 +56,6 @@ public class RecordChooseWindow extends JPanel
 		scrollpane.setColumnHeaderView(new JLabel("HEj"));
 		this.add(new JLabel("Patient: " + user.getName()));
 		this.add(scrollpane);
-
 	}
 
 	public Record getSelectedRecord()

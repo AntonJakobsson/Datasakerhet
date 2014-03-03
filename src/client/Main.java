@@ -57,8 +57,7 @@ public class Main
             }
             catch (AccessDeniedException ex)
             {
-                JOptionPane
-                        .showMessageDialog(null, ex.getMessage(), "Authentication failed", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Authentication failed", JOptionPane.ERROR_MESSAGE);
                 /* Hoppa tillbaks till login */
                 continue;
             }
@@ -109,29 +108,33 @@ public class Main
                     record = chooseRecord.getSelectedRecord();
                 }
                 catch (RuntimeException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage(), "Record retrieval failed",
-                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, e.getMessage(), "Record retrieval failed", JOptionPane.ERROR_MESSAGE);
                     continue;
                 }
             }
             
-            switch (button) 
-            {
-                case RecordChooseWindow.MESSAGE_VIEW: {
-                    editRecord(record);
-                    break;
-                }
-                case RecordChooseWindow.MESSAGE_NEW: {
-                    Record newrecord = newRecord(currentUser, selectedPatient);
-                    /* Lägg till nytt record i listan? */
-                    break;
-                }
-                case RecordChooseWindow.MESSAGE_DELETE: {
-                    /* Confirmation dialog */
-                    state.deleteRecord(record);
-                    /* Ta bort record från listan? */
-                    break;
-                }
+            try {
+	            switch (button) 
+	            {
+	                case RecordChooseWindow.MESSAGE_VIEW: {
+	                    editRecord(record);
+	                    break;
+	                }
+	                case RecordChooseWindow.MESSAGE_NEW: {
+	                    Record newrecord = newRecord(currentUser, selectedPatient);
+	                    /* Lägg till nytt record i listan? */
+	                    break;
+	                }
+	                case RecordChooseWindow.MESSAGE_DELETE: {
+	                    /* Confirmation dialog */
+	                    state.deleteRecord(record);
+	                    /* Ta bort record från listan? */
+	                    break;
+	                }
+	            }
+            }
+            catch(AccessDeniedException ex) {
+            	JOptionPane.showMessageDialog(null, ex.getMessage(), "Access denied", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
