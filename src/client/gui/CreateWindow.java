@@ -1,12 +1,13 @@
 package client.gui;
 
-import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -43,27 +44,29 @@ public class CreateWindow extends JPanel
         this.setLayout(new GridLayout(1,2));
        
         JPanel textPanel = new JPanel();
-        textPanel.setLayout(new GridLayout(2,2));
+        textPanel.setLayout(new GridLayout(2,1,5,5));
+        
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new GridLayout(6,1));
         
         JLabel divisionLabel = new JLabel("Division:");
         division = new JTextField();
         division.setEditable(true);
 
-        textPanel.add(divisionLabel);
-        textPanel.add(division);
+        infoPanel.add(divisionLabel);
+        infoPanel.add(division);
 
         JLabel recordLabel = new JLabel("Record:");
         recordInformation = new JTextArea();
         recordInformation.setEditable(true);
+        recordInformation.setLineWrap(true);
         JScrollPane scroll = new JScrollPane(recordInformation);
-        recordInformation.setPreferredSize(new Dimension(100,60));
         
-        textPanel.add(scroll);
+        
         textPanel.add(recordLabel);
-        textPanel.add(recordInformation);
+        textPanel.add(scroll);
         
-        JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new GridLayout(4,1));
+    
         
         JLabel userLabel = new JLabel("Doctor: " + currentUser.getName());
         JLabel patientLabel = new JLabel("Patient: " + patient.getName());
@@ -119,5 +122,6 @@ public class CreateWindow extends JPanel
                //no nurse selected, cancel was pressed
            }
         }
+     
     }
 }
