@@ -226,6 +226,8 @@ public class Fork implements Runnable
 			}
 			else {
 				db.records().insert(record);
+				/* Re-query record to find user names */
+				record = db.records().findById(record.getId());
 			}
 			
 			/* men svara för fan */

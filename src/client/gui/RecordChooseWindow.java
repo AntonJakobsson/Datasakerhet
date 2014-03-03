@@ -56,9 +56,12 @@ public class RecordChooseWindow extends JPanel
 	 * Ritar om table naer nya records tillkommit
 	 * @param newRecords updated recordslist
 	 */
-	public void updateWindow(ArrayList<Record> newRecords){
+
+	public void updateWindow(ArrayList<Record> newRecords)
+	{
 		Object[][] data = fillMatrix(newRecords);
 		DefaultTableModel model = new DefaultTableModel(data, columnames);
+		this.records = newRecords;
 		table.setModel(model);
 	}
 	
