@@ -253,6 +253,7 @@ public class Fork implements Runnable
 				return;
 			}
 			db.records().delete(record);
+			write(new Packet(Packet.DELETE, 0, gson.toJson(new Record.None())));
 		}
 		catch(SQLException ex) {
 			System.out.println("SQL Exception from deletePost():");

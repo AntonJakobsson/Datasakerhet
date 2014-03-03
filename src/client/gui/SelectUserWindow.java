@@ -34,7 +34,7 @@ public class SelectUserWindow extends JPanel
     
     protected void setup()
     {
-        userLabel = new JLabel("Logged in as: " + currentUser.getName());
+        userLabel = new JLabel(String.format("Logged in as: %s (%s)", currentUser.getName(), User.typeString(currentUser.getType())));
         Object[][] data = new Object[userList.size()][1];
         for(int i =0; i<userList.size();i++){
             data[i][0] = userList.get(i).getName();
