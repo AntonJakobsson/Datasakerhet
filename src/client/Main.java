@@ -124,6 +124,7 @@ public class Main
                 case RecordChooseWindow.MESSAGE_NEW: {
                     Record newrecord = newRecord(currentUser, selectedPatient);
                     /* Lägg till nytt record i listan? */
+                    
                     break;
                 }
                 case RecordChooseWindow.MESSAGE_DELETE: {

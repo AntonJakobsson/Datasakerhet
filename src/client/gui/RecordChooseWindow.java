@@ -59,6 +59,17 @@ public class RecordChooseWindow extends JPanel
 
 	}
 
+	/**
+	 * Ritar om table naer nya records tillkommit
+	 * @param newRecords updated recordslist
+	 */
+	public void updateWindow(ArrayList<Record> newRecords){
+	    
+	    
+	}
+	
+	
+	
 	public Record getSelectedRecord()
 	{
 	    if(table.getSelectedRow() == -1){
