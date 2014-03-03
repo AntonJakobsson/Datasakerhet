@@ -52,7 +52,7 @@ public class EditWindow extends JPanel
         
         int option = JOptionPane.showOptionDialog(null, this, "Edit record",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
-                new String[] { "Save", "Cancel" }, "Save");
+                new String[] { "Save", "Close" }, "Save");
         if(option==0){
             save();
             return option;

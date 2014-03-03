@@ -1,13 +1,11 @@
 package client.gui;
 
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -47,15 +45,16 @@ public class CreateWindow extends JPanel
         textPanel.setLayout(new GridLayout(2,1,5,5));
         
         JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new GridLayout(6,1));
+        infoPanel.setLayout(new GridLayout(4,1));
         
+        /*
         JLabel divisionLabel = new JLabel("Division:");
         division = new JTextField();
         division.setEditable(true);
 
         infoPanel.add(divisionLabel);
         infoPanel.add(division);
-
+         */
         JLabel recordLabel = new JLabel("Record:");
         recordInformation = new JTextArea();
         recordInformation.setEditable(true);
@@ -83,7 +82,7 @@ public class CreateWindow extends JPanel
 
     public Record getCreatedRecord()
     {
-        return new Record(patient.getId(), selectedNurse.getId(), currentUser.getId(), division.getText(),
+        return new Record(patient.getId(), selectedNurse.getId(), currentUser.getId(), currentUser.getDivision(),
                 recordInformation.getText());
     }
 

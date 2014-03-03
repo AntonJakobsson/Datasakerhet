@@ -80,6 +80,7 @@ public class Record
     {
     	this.data = newData;
     }
+    
     public String getData()
     {
         return data;

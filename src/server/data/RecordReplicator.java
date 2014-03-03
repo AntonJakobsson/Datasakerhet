@@ -53,8 +53,8 @@ public class RecordReplicator
         	"WHERE id=?"
         );
         
-        this.findByNurse = connection.prepareStatement(whereQuery("patient=? AND (nurse=? OR division=?)"));
-        this.findByDoctor = connection.prepareStatement(whereQuery("patient=? AND (doctor=? OR division=?)"));
+        this.findByNurse = connection.prepareStatement(whereQuery("r.patient=? AND (r.nurse=? OR r.division=?)"));
+        this.findByDoctor = connection.prepareStatement(whereQuery("r.patient=? AND (r.doctor=? OR r.division=?)"));
     }
     
     public void insert(Record record) throws SQLException
@@ -177,8 +177,8 @@ public class RecordReplicator
                 results.getString("patient_name"),
                 results.getString("nurse_name"),
                 results.getString("doctor_name"),
-                results.getString("data"),
-                results.getString("division")
+                results.getString("division"),
+                results.getString("data")
             );
             records.add(record);
         }

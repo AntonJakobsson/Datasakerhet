@@ -82,6 +82,6 @@ public class SelectUserWindow extends JPanel
         reset();
         return JOptionPane.showOptionDialog(null, this, title,
                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
-               new String[] { "Ok", "Cancel" }, "Ok");
+               new String[] { "Ok", "Close" }, "Ok");
     }
 }

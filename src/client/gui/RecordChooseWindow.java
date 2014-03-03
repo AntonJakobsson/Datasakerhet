@@ -70,6 +70,6 @@ public class RecordChooseWindow extends JPanel
 	public int showDialog()
 	{
 		return JOptionPane.showOptionDialog(null, this, "Records", JOptionPane.DEFAULT_OPTION,
-				JOptionPane.PLAIN_MESSAGE, null, new String[] {"Cancel", "New", "Delete", "View" }, "Ok");
+				JOptionPane.PLAIN_MESSAGE, null, new String[] {"Close", "New", "Delete", "View" }, "Ok");
 	}
 }
