@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
 
 import common.Record;
 import common.User;
@@ -68,7 +69,10 @@ public class RecordChooseWindow extends JPanel
 	    
 	}
 	
-	
+	public void reset(){
+	    DefaultTableModel model = (DefaultTableModel) table.getModel();
+	    model.setRowCount(0);
+	}
 	
 	public Record getSelectedRecord()
 	{
