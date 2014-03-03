@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -55,12 +56,13 @@ public class CreateWindow extends JPanel
         JLabel recordLabel = new JLabel("Record:");
         recordInformation = new JTextArea();
         recordInformation.setEditable(true);
+        recordInformation.setLineWrap(true);
         JScrollPane scroll = new JScrollPane(recordInformation);
-        recordInformation.setPreferredSize(new Dimension(100,60));
+        recordInformation.setSize(new Dimension(100,60));
         
         textPanel.add(scroll);
         textPanel.add(recordLabel);
-        textPanel.add(recordInformation);
+//        textPanel.add(recordInformation);
         
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new GridLayout(4,1));
@@ -120,4 +122,5 @@ public class CreateWindow extends JPanel
            }
         }
     }
+    
 }
