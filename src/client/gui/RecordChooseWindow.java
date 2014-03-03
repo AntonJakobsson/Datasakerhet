@@ -30,12 +30,14 @@ public class RecordChooseWindow extends JPanel
 	public static final int MESSAGE_NEW = 1;
 	public static final int MESSAGE_CANCEL = 0;
 	private final String[] columnames = { "Record ID", "Doctor", "Nurse", "Division" };
+	private JScrollPane scrollpane;
 
 	public RecordChooseWindow(User user, ArrayList<Record> records)
 	{
 		this.records = records;
 		this.user = user;
 		table = fillMatrix(this.records);
+		scrollpane = new JScrollPane(table);
 		setup();
 	}
 
@@ -43,7 +45,6 @@ public class RecordChooseWindow extends JPanel
 	{
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.setLayout(new GridLayout(2, 1));
-		JScrollPane scrollpane = new JScrollPane(table);
 		scrollpane.setPreferredSize(new Dimension(10, 80));
 		scrollpane.setColumnHeaderView(new JLabel("HEj"));
 		this.add(new JLabel("Patient: " + user.getName()));
@@ -57,7 +58,9 @@ public class RecordChooseWindow extends JPanel
 	public void updateWindow(ArrayList<Record> newRecords){
 		reset();
 		table = fillMatrix(newRecords);
-		setup();
+		this.remove(scrollpane);
+		this.add(scrollpane);
+		this.repaint();
 	}
 	
 	private JTable fillMatrix(ArrayList<Record> newRecords)
@@ -92,4 +95,5 @@ public class RecordChooseWindow extends JPanel
 		return JOptionPane.showOptionDialog(null, this, "Records", JOptionPane.DEFAULT_OPTION,
 				JOptionPane.PLAIN_MESSAGE, null, new String[] {"Close", "New", "Delete", "View" }, "Ok");
 	}
+	
 }
