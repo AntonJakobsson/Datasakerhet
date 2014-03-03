@@ -3,6 +3,9 @@ package server;
 import java.net.InetAddress;
 import java.util.HashMap;
 
+/**
+ * Keeps track of banned IP addresses
+ */
 public class IPBans
 {
     protected HashMap<String, Long> bans;
@@ -14,6 +17,12 @@ public class IPBans
         this.attempts = new  HashMap<String, Integer>();
     }
     
+    /**
+     * Bans an address from connecting to the server
+     * @param address Remote address
+     * @param minutes Ban duration, in minutes
+     * @param reason Reason (for logging purposes)
+     */
     public void ban(InetAddress address, int minutes, String reason)
     {
         long expires = System.currentTimeMillis() + (long)minutes * 60000L;
@@ -21,6 +30,9 @@ public class IPBans
         Log.write(String.format("%s was banned for %d minutes. Reason: %s", address.getHostAddress(), minutes, reason));
     }
     
+    /** 
+     * Registers a login attempt from a given address. Returns true if the attempt is "ok", or false if the client should be disconnected 
+     */
     public boolean attempt(InetAddress address)
     {
         Integer count = this.attempts.get(address.getHostAddress());
@@ -39,6 +51,9 @@ public class IPBans
         return true;
     }
     
+    /** 
+     * Checks if a given address is currently banned from connecting to the server 
+     */
     public boolean isBanned(InetAddress address)
     {
         Long expires = this.bans.get(address.getHostAddress());

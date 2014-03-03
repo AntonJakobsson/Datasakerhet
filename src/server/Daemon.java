@@ -14,6 +14,9 @@ import javax.net.ssl.TrustManagerFactory;
 
 import server.data.Database;
 
+/**
+ * Listens for SSL connections and manages clients
+ */
 public class Daemon
 {
 	public final static String KEYSTORE = "server_key.store";
@@ -31,6 +34,11 @@ public class Daemon
         this.db.connect();
     }
     
+    /**
+     * The main listening loop
+     * @param port
+     * @throws IOException
+     */
     public void listen(int port) throws IOException
     {
         this.port = port;

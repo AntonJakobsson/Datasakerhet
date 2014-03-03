@@ -21,6 +21,9 @@ import common.Record;
 import common.Security;
 import common.User;
 
+/**
+ * Represents a client connection
+ */
 public class Fork implements Runnable
 {
     protected Daemon server;
@@ -36,6 +39,12 @@ public class Fork implements Runnable
     protected User user;
     protected boolean authenticated;
     
+    /**
+     * Initializes a new client connection
+     * @param daemon Reference to the parent daemon
+     * @param socket SSL Socket
+     * @throws SSLPeerUnverifiedException
+     */
     public Fork(Daemon daemon, SSLSocket socket) throws SSLPeerUnverifiedException
     {
         this.server = daemon;
@@ -55,6 +64,7 @@ public class Fork implements Runnable
             this.input  = new PacketReader(this.socket.getInputStream());
             this.output = new PacketWriter(this.socket.getOutputStream());
             
+            /* Grab the user the current certificate belongs to */
             int user_id = this.getUserIdFromCert(cert);
             this.user = db.users().findById(user_id);
             
@@ -98,11 +108,6 @@ public class Fork implements Runnable
 			System.out.println("Caught SQL Exception in network loop :S");
 			e.printStackTrace();
 		}
-		catch (InterruptedException e)
-		{
-			System.out.println("Thread interrupted during failed authentication");
-			e.printStackTrace();
-		}
         finally {
             this.close();
         }
@@ -118,14 +123,18 @@ public class Fork implements Runnable
     	message(String.format("You have been banned for %d minutes\nReason: %s", minutes, reason));
     	server.ban(socket.getInetAddress(), minutes, reason);
 		this.close();
-    }
-    
+    } 
     
     /* Packet handlers */
     
     private void handleQueryUsers(int type)
 	{
-		ensureAuth();
+    	if (!this.authenticated) {
+			write(new Packet(Packet.QUERY_USER, Packet.DENIED, "You must be authenticated to query users"));
+			Log.write(String.format("%s attempted to query users without being authenticated", this.user));
+			return;
+		}
+    	
 		ArrayList<User> results = new ArrayList<User>();;
 	    try 
 	    {
@@ -157,7 +166,12 @@ public class Fork implements Runnable
 
 	private void handleQueryRecord(Packet p)
 	{
-		ensureAuth();
+		if (!this.authenticated) {
+			write(new Packet(Packet.QUERY_REC, Packet.DENIED, "You must be authenticated to query records"));
+			Log.write(String.format("%s attempted to query records without being authenticated", this.user));
+			return;
+		}
+		
 		ArrayList<Record> results = new ArrayList<Record>();
 		try {
 			User user = db.users().findById(p.getCode());
@@ -187,7 +201,12 @@ public class Fork implements Runnable
 
 	private void addPost(Record record)
 	{
-		ensureAuth();
+		if (!this.authenticated) {
+			write(new Packet(Packet.POST, Packet.DENIED, "You must be authenticated to add/edit records"));
+			Log.write(String.format("%s attempted to create a record without being authenticated", this.user));
+			return;
+		}
+		
 		try {
 			if (this.user.getType() != User.DOCTOR) {
 				/* Endast doctor har rätt att ändra i records */
@@ -220,7 +239,11 @@ public class Fork implements Runnable
 
 	private void deletePost(Record record)
 	{
-		ensureAuth();
+		if (!this.authenticated) {
+			write(new Packet(Packet.DELETE, Packet.DENIED, "You must be authenticated to delete records"));
+			Log.write(String.format("%s attempted to delete record %d without authentication", this.user, record.getId()));
+			return;
+		}
 		try {
 			if (this.user.getType() != User.GOVERNMENT) {
 				write(new Packet(Packet.DELETE, Packet.DENIED, "Only government agencies may delete records"));
@@ -235,34 +258,40 @@ public class Fork implements Runnable
 		}
 	}
 
-	private void handleAuthPacket(String password) throws SQLException, IOException, InterruptedException
+	private void handleAuthPacket(String password) throws SQLException, IOException
     {
-	    /* Skip packet if authed */
+	    /* Skip packet if a user is already authed */
 	    if (this.authenticated) return;
 
     	String hash = Security.hash(password, user.getSalt());
     	String message;
     	int    code;
     	
-    	if (hash.equals(user.getPassword())) {
+    	/* Compare the computed hash to the one stored in the database */
+    	if (hash.equals(user.getPassword())) 
+    	{
     		message = gson.toJson(user);
     		code = Packet.SUCCESS;
     		this.authenticated = true;
     		Log.write(String.format("%s authenticated from %s", this.user, socket.getInetAddress()));
     	} 
-    	else {
-    		message = "Invalid username or password";
+    	else /* Invalid password */
+    	{
+    		message = "Invalid password";
     		code = Packet.ERROR;
     		this.authenticated = false;
     		Log.write(String.format("Failed login attempt: %s from %s", this.user, socket.getInetAddress()));
     		if (!server.attempt(socket.getInetAddress()))
     			socket.close();
-    		Thread.sleep(500);
+    		try { Thread.sleep(500); } catch (InterruptedException ex) { }
     	}
     	Packet p = new Packet(Packet.AUTH, code, message);
     	output.write(p);
     }
     
+	/**
+	 * Closes the client connection
+	 */
     public void close()
     {
         if (this.socket == null) return;
@@ -274,6 +303,10 @@ public class Fork implements Runnable
         }
     }
     
+    /**
+     * Writes a packet to the client
+     * @param packet Packet object
+     */
     public void write(Packet packet) 
     {
         try {
@@ -283,15 +316,6 @@ public class Fork implements Runnable
             System.out.println("Write error: " + ex.getMessage());
             close();
         }
-    }
-    
-    protected boolean ensureAuth() 
-    {
-        if (!authenticated) {
-            write(new Packet(Packet.MESSAGE, 0, "Not authenticated"));
-            return false;
-        }
-        return true;
     }
     
     protected int getUserIdFromCert(X509Certificate cert) 

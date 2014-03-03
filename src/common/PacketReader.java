@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
-
+/** Helper class for reading packets from a byte stream */
 public class PacketReader
 {
     BufferedInputStream stream;
