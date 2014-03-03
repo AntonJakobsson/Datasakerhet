@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -60,6 +61,7 @@ public class CreateWindow extends JPanel
         recordInformation.setEditable(true);
         recordInformation.setLineWrap(true);
         JScrollPane scroll = new JScrollPane(recordInformation);
+
         
         
         textPanel.add(recordLabel);
@@ -123,4 +125,5 @@ public class CreateWindow extends JPanel
         }
      
     }
+    
 }
